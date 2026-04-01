@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post a Job — Smart Job Portal</title>
+ <link rel="stylesheet" href="../../Frontend/css/main.css">
+
+</head>
+<body class="page-wrapper">
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">Job<span>Portal</span></a>
+      <div class="nav-links" id="nav-links"></div>
+      <div class="nav-actions" id="nav-actions"></div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container" style="max-width:720px">
+      <div class="page-header">
+        <h1>Post a New Job</h1>
+        <p class="text-sec">Fill in the details to attract the best candidates</p>
+      </div>
+
+      <div id="page-alert"></div>
+
+      <div class="card">
+        <form id="post-job-form">
+
+          <div class="form-group">
+            <label class="form-label">Job Title *</label>
+            <input type="text" id="title" class="form-control" placeholder="e.g. Senior Frontend Developer" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Job Description *</label>
+            <textarea id="description" class="form-control" rows="8"
+              placeholder="Describe responsibilities, requirements, company culture…" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="category" class="form-control">
+                <option value="">Select category…</option>
+                <option>Technology</option>
+                <option>Marketing</option>
+                <option>Finance</option>
+                <option>Design</option>
+                <option>Engineering</option>
+                <option>Healthcare</option>
+                <option>Education</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Job Type</label>
+              <select id="job_type" class="form-control">
+                <option value="full-time">Full Time</option>
+                <option value="part-time">Part Time</option>
+                <option value="contract">Contract</option>
+                <option value="internship">Internship</option>
+                <option value="remote">Remote</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" id="location" class="form-control" placeholder="e.g. New York, NY or Remote">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Minimum Salary ($/yr)</label>
+              <input type="number" id="salary_min" class="form-control" placeholder="e.g. 60000" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Maximum Salary ($/yr)</label>
+              <input type="number" id="salary_max" class="form-control" placeholder="e.g. 90000" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Required Skills</label>
+            <input type="text" id="skills" class="form-control"
+              placeholder="e.g. React, Node.js, PostgreSQL (comma-separated)">
+            <div class="form-hint">Separate skills with commas. This helps candidates find your job.</div>
+          </div>
+
+          <div style="display:flex;gap:12px;justify-content:flex-end;padding-top:8px">
+            <a href="employer-dashboard.html" class="btn btn-outline">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="post-btn">🚀 Post Job</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../Frontend/js/app.js"></script>
+  <script>
+    async function init() {
+      await Auth.requireRole('employer', 'login.html');
+    }
+
+    document.getElementById('post-job-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('post-btn');
+      setLoading(btn, true, 'Posting…');
+
+      try {
+        const data = await api.post('jobs.php?action=create', {
+          title:       document.getElementById('title').value,
+          description: document.getElementById('description').value,
+          category:    document.getElementById('category').value,
+          job_type:    document.getElementById('job_type').value,
+          location:    document.getElementById('location').value,
+          salary_min:  document.getElementById('salary_min').value || 0,
+          salary_max:  document.getElementById('salary_max').value || 0,
+          skills:      document.getElementById('skills').value,
+        });
+        showAlert('#page-alert', 'Job posted successfully! Redirecting…', 'success');
+        setTimeout(() => window.location.href = 'employer-dashboard.html', 1500);
+      } catch (err) {
+        showAlert('#page-alert', err.message, 'error');
+        setLoading(btn, false);
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>

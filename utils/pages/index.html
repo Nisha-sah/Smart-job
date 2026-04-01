@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Job Portal — Find Your Dream Job</title>
+ <link rel="stylesheet" href="../css/main.css">
+</head>
+<body class="page-wrapper">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="logo">Job<span>Portal</span></a>
+      <div class="nav-links" id="nav-links"></div>
+      <div class="nav-actions" id="nav-actions"></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-content">
+      <h1>Find Your <em>Dream Job</em><br>Today</h1>
+      <p>Connect with top employers and discover opportunities that match your skills and ambitions.</p>
+      <div class="search-bar">
+        <input type="text" id="search-keyword" placeholder="Job title, skills, or keywords…">
+        <input type="text" id="search-location" placeholder="Location" style="max-width:180px">
+        <button class="btn btn-primary" onclick="searchJobs()">Search Jobs</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding: 40px 0; border-bottom: 1px solid var(--border)">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-jobs">—</div>
+          <div class="stat-label">Active Job Listings</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-seekers">—</div>
+          <div class="stat-label">Registered Job Seekers</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-employers">—</div>
+          <div class="stat-label">Companies Hiring</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" id="stat-placed">—</div>
+          <div class="stat-label">Successful Placements</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT JOBS -->
+  <main>
+    <div class="container">
+      <div class="flex-between mb-24">
+        <div>
+          <h2 style="font-size:24px; font-weight:800">Recent Jobs Available</h2>
+          <p class="text-sec mt-8">Freshly posted opportunities waiting for you</p>
+        </div>
+        <a href="jobs.html" class="btn btn-outline">View All →</a>
+      </div>
+
+      <div id="jobs-list" class="jobs-grid">
+        <div class="loader"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CTA -->
+  <section style="padding: 80px 0; background: var(--bg-card); border-top: 1px solid var(--border)">
+    <div class="container text-center">
+      <h2 style="font-size:32px; font-weight:800; margin-bottom:12px">Ready to hire top talent?</h2>
+      <p class="text-sec" style="margin-bottom:32px">Post your job and reach thousands of qualified candidates</p>
+      <a href="register.html?role=employer" class="btn btn-primary" style="padding:14px 40px; font-size:16px">
+        Post a Job — It's Free
+      </a>
+    </div>
+  </section>
+
+  <footer style="padding:24px; text-align:center; color:var(--text-muted); font-size:13px; border-top:1px solid var(--border)">
+    © 2025 Smart Job Portal. All rights reserved.
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    async function loadJobs() {
+      const list = document.getElementById('jobs-list');
+      try {
+        const data = await api.get('jobs.php?action=list');
+        const jobs = data.jobs.slice(0, 6);
+        if (!jobs.length) {
+          list.innerHTML = '<div class="empty-state"><div class="icon">💼</div><h3>No jobs posted yet</h3><p>Check back soon!</p></div>';
+          return;
+        }
+        list.innerHTML = jobs.map(job => `
+          <div class="card card-hover">
+            <div class="job-card">
+              <div class="job-card-logo">🏢</div>
+              <div class="job-card-body">
+                <div class="job-card-title">${job.title}</div>
+                <div class="job-card-company">${job.employer_name}</div>
+                <div class="job-card-meta">
+                  <span>📍 ${job.location || 'Remote'}</span>
+                  <span>💼 ${job.job_type}</span>
+                  <span>💰 ${formatSalary(job.salary_min, job.salary_max)}</span>
+                  ${job.category ? `<span>🏷 ${job.category}</span>` : ''}
+                </div>
+              </div>
+              <div class="job-card-actions">
+                ${statusBadge(job.status)}
+                <a href="job-detail.html?id=${job.id}" class="btn btn-primary btn-sm">View Job</a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch {
+        list.innerHTML = '<div class="alert alert-error">Failed to load jobs.</div>';
+      }
+    }
+
+    function searchJobs() {
+      const kw  = document.getElementById('search-keyword').value;
+      const loc = document.getElementById('search-location').value;
+      window.location.href = `jobs.html?keyword=${encodeURIComponent(kw)}&location=${encodeURIComponent(loc)}`;
+    }
+
+    document.getElementById('search-keyword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchJobs();
+    });
+
+    // Fake stats for now (replace with real API later)
+    document.getElementById('stat-jobs').textContent = '—';
+    document.getElementById('stat-seekers').textContent = '—';
+    document.getElementById('stat-employers').textContent = '—';
+    document.getElementById('stat-placed').textContent = '—';
+
+    loadJobs();
+  </script>
+</body>
+</html>
