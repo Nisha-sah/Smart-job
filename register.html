@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — Smart Job Portal</title>
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:40px 24px; }
+    .auth-wrap { width:100%; max-width:480px; }
+    .auth-logo { text-align:center; margin-bottom:28px; font-family:'Plus Jakarta Sans',sans-serif; font-size:26px; font-weight:800; }
+    .auth-logo span { color:var(--accent); }
+    .auth-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:36px; }
+    .auth-title { font-size:22px; font-weight:800; margin-bottom:4px; }
+    .auth-subtitle { color:var(--text-sec); font-size:14px; margin-bottom:28px; }
+    .role-toggle { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px; }
+    .role-card {
+      border:2px solid var(--border); border-radius:var(--radius-sm); padding:16px 12px;
+      text-align:center; cursor:pointer; transition:var(--transition);
+    }
+    .role-card:hover { border-color:var(--accent); }
+    .role-card.selected { border-color:var(--accent); background:var(--accent-dim); }
+    .role-card .role-icon { font-size:28px; margin-bottom:8px; }
+    .role-card .role-name { font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:14px; }
+    .role-card .role-desc { font-size:12px; color:var(--text-sec); margin-top:2px; }
+  </style>
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-logo">Job<span>Portal</span></div>
+    <div class="auth-card">
+      <h1 class="auth-title">Create your account</h1>
+      <p class="auth-subtitle">Join thousands of job seekers and employers</p>
+
+      <div id="alert-area"></div>
+
+      <!-- Role selection -->
+      <div class="form-group">
+        <label class="form-label">I am a…</label>
+        <div class="role-toggle">
+          <div class="role-card selected" id="role-seeker" onclick="selectRole('seeker')">
+            <div class="role-icon">🔍</div>
+            <div class="role-name">Job Seeker</div>
+            <div class="role-desc">Find opportunities</div>
+          </div>
+          <div class="role-card" id="role-employer" onclick="selectRole('employer')">
+            <div class="role-icon">🏢</div>
+            <div class="role-name">Employer</div>
+            <div class="role-desc">Hire talent</div>
+          </div>
+        </div>
+      </div>
+
+      <form id="register-form">
+        <input type="hidden" id="role" value="seeker">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="name" class="form-control" placeholder="Jane Smith" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="password" class="form-control" placeholder="Min 8 characters" required minlength="8">
+          <div class="form-hint">Must be at least 8 characters</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" id="confirm-password" class="form-control" placeholder="Repeat password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="register-btn">Create Account</button>
+      </form>
+
+      <p style="text-align:center; font-size:14px; color:var(--text-sec); margin-top:20px">
+        Already have an account? <a href="login.html" style="font-weight:600">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="../js/app.js"></script>
+  <script>
+    // Pre-select role from URL param
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('role') === 'employer') selectRole('employer');
+
+    function selectRole(role) {
+      document.getElementById('role').value = role;
+      document.getElementById('role-seeker').classList.toggle('selected', role === 'seeker');
+      document.getElementById('role-employer').classList.toggle('selected', role === 'employer');
+    }
+
+    document.getElementById('register-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm-password').value;
+
+      if (password !== confirm) {
+        showAlert('#alert-area', 'Passwords do not match.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('register-btn');
+      setLoading(btn, true, 'Creating account…');
+      try {
+        const data = await api.post('auth.php?action=register', {
+          name:     document.getElementById('name').value,
+          email:    document.getElementById('email').value,
+          password,
+          role:     document.getElementById('role').value,
+        });
+        const user = data.user;
+        window.location.href = user.role === 'employer' ? 'employer-dashboard.html' : 'seeker-dashboard.html';
+      } catch (err) {
+        showAlert('#alert-area', err.message, 'error');
+        setLoading(btn, false);
+      }
+    });
+  </script>
+</body>
+</html>
