@@ -1,214 +1,221 @@
-// frontend/js/app.js
-// Shared JS: API client, auth state, notifications, navbar
+// =============================================================
+// ── DEV 2: Employer & Job Posting Functions ───────────────────
+// WRITTEN BY: Developer 2
+// Covers:
+//   - Job posting CRUD (create, read, update, delete)
+//   - Applicant review (view, accept, reject)
+//   - Employer dashboard rendering (stats, job table, applicant cards)
+// =============================================================
 
+// ── Job Posting API Calls ─────────────────────────────────────
 
-// ── Auth Helpers ──────────────────────────────────────────────
-const Auth = {
-  _user: null,
+// Create a new job posting (employer)
+async function createJob(jobData) {
+  return await api.post('jobs.php?action=create', jobData);
+}
 
-  async getUser() {
-    if (this._user) return this._user;
-    try {
-      const data = await api.get('auth.php?action=me');
-      this._user = data.user;
-      return this._user;
-    } catch {
-      return null;
-    }
-  },
+// Update an existing job posting (employer)
+async function updateJob(jobId, jobData) {
+  return await api.put(`jobs.php?action=update&id=${jobId}`, jobData);
+}
 
-  async requireAuth(redirectTo = 'login.html') {
-    const user = await this.getUser();
-    if (!user) { window.location.href = redirectTo; return null; }
-    return user;
-  },
+// Delete a job posting (employer)
+async function deleteJob(jobId) {
+  return await api.delete(`jobs.php?action=delete&id=${jobId}`);
+}
 
-  async requireRole(role, redirectTo = 'index.html') {
-    const user = await this.requireAuth();
-    if (user && user.role !== role) { window.location.href = redirectTo; return null; }
-    return user;
-  },
+// Get all jobs posted by the currently logged-in employer
+async function getMyJobs() {
+  return await api.get('jobs.php?action=my');
+}
 
-  async logout() {
-    await api.post('auth.php?action=logout', {});
-    this._user = null;
-    window.location.href = 'login.html';
+// ── Applicant Review API Calls ────────────────────────────────
+
+// Get all applicants for a specific job (employer only)
+async function getJobApplicants(jobId) {
+  return await api.get(`applications.php?action=job&job_id=${jobId}`);
+}
+
+// Update application status: accepted / rejected / pending (employer only)
+async function updateApplicationStatus(appId, status) {
+  return await api.put(`applications.php?action=status&id=${appId}`, { status });
+}
+
+// ── Employer Dashboard Stats ──────────────────────────────────
+
+// Calculate and display the 4 stat numbers at the top of employer dashboard
+function renderEmployerStats(jobs) {
+  const total      = jobs.length;
+  const open       = jobs.filter(j => j.status === 'open').length;
+  const closed     = jobs.filter(j => j.status === 'closed').length;
+  const applicants = jobs.reduce((sum, j) => sum + Number(j.applicant_count), 0);
+
+  document.getElementById('stat-total').textContent      = total;
+  document.getElementById('stat-open').textContent       = open;
+  document.getElementById('stat-closed').textContent     = closed;
+  document.getElementById('stat-applicants').textContent = applicants;
+}
+
+// ── Employer Job Table Renderer ───────────────────────────────
+
+// Build the HTML table of all jobs posted by this employer
+function renderEmployerJobTable(jobs) {
+  if (!jobs.length) {
+    return `
+      <div class="empty-state">
+        <div class="icon">📋</div>
+        <h3>No jobs posted yet</h3>
+        <p>Create your first listing to start receiving applications</p>
+        <a href="post-job.html" class="btn btn-primary mt-16">Post a Job</a>
+      </div>`;
   }
-};
 
-// ── Notifications ─────────────────────────────────────────────
-const Notifications = {
-  async load() {
-    try {
-      const data = await api.get('notifications.php?action=list');
-      this.updateBadge(data.unread_count);
-      this.renderPanel(data.notifications);
-    } catch {}
-  },
+  return `
+    <div class="table-wrap card" style="padding:0">
+      <table>
+        <thead>
+          <tr>
+            <th>Job Title</th>
+            <th>Type</th>
+            <th>Location</th>
+            <th>Salary</th>
+            <th>Applicants</th>
+            <th>Status</th>
+            <th>Posted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${jobs.map(job => `
+            <tr>
+              <td>
+                <strong>${job.title}</strong>
+                ${job.category
+                  ? `<div class="text-muted" style="font-size:12px">${job.category}</div>`
+                  : ''}
+              </td>
+              <td><span class="badge badge-gray">${job.job_type}</span></td>
+              <td>${job.location || '—'}</td>
+              <td>${formatSalary(job.salary_min, job.salary_max)}</td>
+              <td><span class="badge badge-accent">${job.applicant_count}</span></td>
+              <td>${statusBadge(job.status)}</td>
+              <td class="text-muted">${formatDate(job.created_at)}</td>
+              <td>
+                <div style="display:flex; gap:6px">
+                  <button class="btn btn-sm btn-outline"
+                    onclick="openEditModal(${job.id})">Edit</button>
+                  <button class="btn btn-sm btn-danger"
+                    onclick="confirmDeleteJob(${job.id}, this)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
 
-  updateBadge(count) {
-    const badge = document.getElementById('notif-badge');
-    if (!badge) return;
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'flex' : 'none';
-  },
+// ── Applicant Cards Renderer ──────────────────────────────────
 
-  renderPanel(notifications) {
-    const list = document.getElementById('notif-list');
-    if (!list) return;
-    if (!notifications.length) {
-      list.innerHTML = '<div class="empty-state" style="padding:32px"><p>No notifications yet</p></div>';
-      return;
-    }
-    list.innerHTML = notifications.map(n => `
-      <div class="notif-item ${n.is_read ? '' : 'unread'}" onclick="Notifications.markRead(${n.id}, this)">
-        ${!n.is_read ? '<div class="notif-dot"></div>' : '<div style="width:8px"></div>'}
-        <div>
-          <div class="notif-text">${n.message}</div>
-          <div class="notif-time">${timeAgo(n.created_at)}</div>
-        </div>
-      </div>
-    `).join('');
-  },
-
-  async markRead(id, el) {
-    await api.post(`notifications.php?action=read&id=${id}`, {});
-    el.classList.remove('unread');
-    el.querySelector('.notif-dot')?.remove();
-    const badge = document.getElementById('notif-badge');
-    if (badge) {
-      const current = parseInt(badge.textContent) - 1;
-      badge.textContent = current;
-      if (current <= 0) badge.style.display = 'none';
-    }
-  },
-
-  async markAllRead() {
-    await api.post('notifications.php?action=read-all', {});
-    document.querySelectorAll('.notif-item.unread').forEach(el => {
-      el.classList.remove('unread');
-      el.querySelector('.notif-dot')?.remove();
-    });
-    const badge = document.getElementById('notif-badge');
-    if (badge) badge.style.display = 'none';
+// Build the applicant review cards for a selected job
+function renderApplicantCards(applicants) {
+  if (!applicants.length) {
+    return `
+      <div class="empty-state">
+        <div class="icon">👥</div>
+        <h3>No applicants yet</h3>
+        <p>Share this job to attract candidates</p>
+      </div>`;
   }
-};
 
-// ── UI Helpers ────────────────────────────────────────────────
-function showAlert(container, message, type = 'error') {
-  const el = document.getElementById(container) || document.querySelector(container);
-  if (!el) return;
-  el.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-  setTimeout(() => el.innerHTML = '', 5000);
-}
-
-function setLoading(btn, loading, text = null) {
-  if (loading) {
-    btn._origText = btn.textContent;
-    btn.textContent = text || 'Loading…';
-    btn.disabled = true;
-  } else {
-    btn.textContent = btn._origText || btn.textContent;
-    btn.disabled = false;
-  }
-}
-
-function timeAgo(dateStr) {
-  const diff = (Date.now() - new Date(dateStr)) / 1000;
-  if (diff < 60)   return 'just now';
-  if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-  if (diff < 86400)return `${Math.floor(diff/3600)}h ago`;
-  return `${Math.floor(diff/86400)}d ago`;
-}
-
-function formatSalary(min, max) {
-  if (!min && !max) return 'Salary not specified';
-  const fmt = n => '$' + Number(n).toLocaleString();
-  if (min && max) return `${fmt(min)} – ${fmt(max)}`;
-  if (min) return `From ${fmt(min)}`;
-  return `Up to ${fmt(max)}`;
-}
-
-function formatDate(dateStr) {
-  return new Date(dateStr).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
-}
-
-function statusBadge(status) {
-  const map = {
-    pending:  'badge-yellow',
-    accepted: 'badge-green',
-    rejected: 'badge-red',
-    open:     'badge-green',
-    closed:   'badge-gray',
-  };
-  return `<span class="badge ${map[status] || 'badge-gray'}">${status}</span>`;
-}
-
-// ── Navbar Init ───────────────────────────────────────────────
-async function initNavbar() {
-  const user = await Auth.getUser();
-  const navLinks  = document.getElementById('nav-links');
-  const navActions = document.getElementById('nav-actions');
-
-  if (user) {
-    if (navLinks) {
-      if (user.role === 'seeker') {
-        navLinks.innerHTML = `
-          <a href="index.html">Home</a>
-          <a href="jobs.html">Find Jobs</a>
-          <a href="seeker-dashboard.html">Dashboard</a>
-        `;
-      } else {
-        navLinks.innerHTML = `
-          <a href="index.html">Home</a>
-          <a href="post-job.html">Post Job</a>
-          <a href="employer-dashboard.html">Dashboard</a>
-        `;
-      }
-    }
-
-    if (navActions) {
-      navActions.innerHTML = `
-        <div style="position:relative">
-          <button class="notif-btn" id="notif-toggle" onclick="toggleNotifPanel()">🔔
-            <span class="notif-badge" id="notif-badge" style="display:none">0</span>
-          </button>
-          <div class="notif-panel" id="notif-panel">
-            <div class="notif-panel-header">
-              <span>Notifications</span>
-              <button class="btn btn-sm btn-outline" onclick="Notifications.markAllRead()">Mark all read</button>
+  return `
+    <div class="jobs-grid">
+      ${applicants.map(a => `
+        <div class="card">
+          <div style="display:flex; justify-content:space-between;
+            align-items:flex-start; flex-wrap:wrap; gap:12px">
+            <div>
+              <div style="font-weight:700; font-size:16px">${a.name}</div>
+              <div class="text-sec" style="font-size:13px">
+                ${a.email}${a.phone ? ' · ' + a.phone : ''}
+              </div>
+              ${a.location
+                ? `<div class="text-muted" style="font-size:13px">📍 ${a.location}</div>`
+                : ''}
+              <div style="margin-top:8px; font-size:13px; color:var(--text-muted)">
+                Applied ${formatDate(a.applied_at)}
+              </div>
             </div>
-            <div id="notif-list"><div class="loader"></div></div>
+            <div style="display:flex; flex-direction:column;
+              align-items:flex-end; gap:8px">
+              ${statusBadge(a.status)}
+              ${a.resume_path
+                ? `<a href="../${a.resume_path}" target="_blank"
+                    class="btn btn-outline btn-sm">📄 Resume</a>`
+                : '<span class="text-muted" style="font-size:12px">No resume</span>'}
+            </div>
+          </div>
+          ${a.cover_letter ? `
+            <div style="margin-top:12px; padding-top:12px;
+              border-top:1px solid var(--border);
+              font-size:13px; color:var(--text-sec)">
+              ${a.cover_letter}
+            </div>` : ''}
+          <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btn btn-sm"
+              style="background:rgba(0,200,150,0.15); color:var(--green);
+                border:1px solid rgba(0,200,150,0.3)"
+              onclick="confirmStatusUpdate(${a.id}, 'accepted', this)">
+              ✓ Accept
+            </button>
+            <button class="btn btn-sm btn-danger"
+              onclick="confirmStatusUpdate(${a.id}, 'rejected', this)">
+              ✕ Reject
+            </button>
+            <button class="btn btn-sm btn-outline"
+              onclick="confirmStatusUpdate(${a.id}, 'pending', this)">
+              ⟳ Mark Pending
+            </button>
           </div>
         </div>
-        <a href="profile.html" class="btn btn-outline btn-sm">👤 ${user.name.split(' ')[0]}</a>
-        <button class="btn btn-outline btn-sm" onclick="Auth.logout()">Log Out</button>
-      `;
-      Notifications.load();
-    }
-  } else {
-    if (navActions) {
-      navActions.innerHTML = `
-        <a href="login.html" class="btn btn-outline btn-sm">Log In</a>
-        <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
-      `;
-    }
-  }
-
-  // Highlight active link
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    if (a.href === window.location.href) a.classList.add('active');
-  });
+      `).join('')}
+    </div>`;
 }
 
-function toggleNotifPanel() {
-  document.getElementById('notif-panel')?.classList.toggle('open');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('#notif-toggle') && !e.target.closest('#notif-panel')) {
-    document.getElementById('notif-panel')?.classList.remove('open');
-  }
-});
+// ── Button Action Handlers ────────────────────────────────────
 
-// ── Auto-init ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', initNavbar);
+// Handle accept / reject / pending button click on applicant card
+async function confirmStatusUpdate(appId, status, btn) {
+  setLoading(btn, true, '…');
+  try {
+    await updateApplicationStatus(appId, status);
+    // Reload applicant list for the currently selected job
+    const jobId = document.getElementById('job-select')?.value;
+    if (jobId) {
+      const data = await getJobApplicants(jobId);
+      document.getElementById('applicants-list').innerHTML =
+        renderApplicantCards(data.applications);
+    }
+  } catch (err) {
+    alert(err.message);
+    setLoading(btn, false);
+  }
+}
+
+// Handle delete job button click — confirms before deleting
+async function confirmDeleteJob(jobId, btn) {
+  if (!confirm('Delete this job posting? This cannot be undone.')) return;
+  setLoading(btn, true, '…');
+  try {
+    await deleteJob(jobId);
+    // Reload and re-render the full job table and stats
+    const data = await getMyJobs();
+    renderEmployerStats(data.jobs);
+    document.getElementById('jobs-list').innerHTML =
+      renderEmployerJobTable(data.jobs);
+  } catch (err) {
+    alert(err.message);
+    setLoading(btn, false);
+  }
+}
+

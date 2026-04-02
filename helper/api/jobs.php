@@ -134,3 +134,41 @@ function handleSaved() {
 
     jsonResponse(['jobs' => $jobs]);
 }
+
+function handleCreate() {
+    global $pdo;
+
+    $input = json_decode(file_get_contents('php://input'), true);
+
+    if (empty($input['title']) || empty($input['description'])) {
+        jsonError('Title and description are required.');
+    }
+
+    // Get logged-in employer id
+    $employer = requireAuth('employer');
+
+    $stmt = $pdo->prepare("
+        INSERT INTO jobs 
+        (title, description, category, job_type, location, salary_min, salary_max, skills, created_at, status, employer_id)
+        VALUES
+        (:title, :description, :category, :job_type, :location, :salary_min, :salary_max, :skills, NOW(), 'open', :employer_id)
+    ");
+
+    try {
+        $stmt->execute([
+            ':title'       => $input['title'],
+            ':description' => $input['description'],
+            ':category'    => $input['category'],
+            ':job_type'    => $input['job_type'],
+            ':location'    => $input['location'],
+            ':salary_min'  => $input['salary_min'],
+            ':salary_max'  => $input['salary_max'],
+            ':skills'      => $input['skills'],
+            ':employer_id' => $employer['id']
+        ]);
+
+        jsonResponse(['success' => true, 'job_id' => $pdo->lastInsertId()]);
+    } catch (Exception $e) {
+        jsonError($e->getMessage());
+    }
+}

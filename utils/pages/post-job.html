@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Post a Job — Smart Job Portal</title>
- <link rel="stylesheet" href="../../Frontend/css/main.css">
-
+  <link rel="stylesheet" href="../../Frontend/css/main.css">
 </head>
 <body class="page-wrapper">
   <nav class="navbar">
@@ -27,18 +26,19 @@
 
       <div class="card">
         <form id="post-job-form">
-
+          <!-- Job Title -->
           <div class="form-group">
             <label class="form-label">Job Title *</label>
             <input type="text" id="title" class="form-control" placeholder="e.g. Senior Frontend Developer" required>
           </div>
 
+          <!-- Job Description -->
           <div class="form-group">
             <label class="form-label">Job Description *</label>
-            <textarea id="description" class="form-control" rows="8"
-              placeholder="Describe responsibilities, requirements, company culture…" required></textarea>
+            <textarea id="description" class="form-control" rows="8" placeholder="Describe responsibilities, requirements, company culture…" required></textarea>
           </div>
 
+          <!-- Category & Job Type -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Category</label>
@@ -66,11 +66,13 @@
             </div>
           </div>
 
+          <!-- Location -->
           <div class="form-group">
             <label class="form-label">Location</label>
             <input type="text" id="location" class="form-control" placeholder="e.g. New York, NY or Remote">
           </div>
 
+          <!-- Salary -->
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Minimum Salary ($/yr)</label>
@@ -82,13 +84,14 @@
             </div>
           </div>
 
+          <!-- Skills -->
           <div class="form-group">
             <label class="form-label">Required Skills</label>
-            <input type="text" id="skills" class="form-control"
-              placeholder="e.g. React, Node.js, PostgreSQL (comma-separated)">
+            <input type="text" id="skills" class="form-control" placeholder="e.g. React, Node.js, PostgreSQL (comma-separated)">
             <div class="form-hint">Separate skills with commas. This helps candidates find your job.</div>
           </div>
 
+          <!-- Buttons -->
           <div style="display:flex;gap:12px;justify-content:flex-end;padding-top:8px">
             <a href="employer-dashboard.html" class="btn btn-outline">Cancel</a>
             <button type="submit" class="btn btn-primary" id="post-btn">🚀 Post Job</button>
@@ -98,37 +101,52 @@
     </div>
   </main>
 
+  <!-- ── Scripts ───────────────────────────────────────────────── -->
+
+  <!-- Auth library (must be first) -->
+  <script src="../../Frontend/js/auth.js"></script>
+
+  <!-- App helpers (API, setLoading, etc.) -->
   <script src="../../Frontend/js/app.js"></script>
+
+  <!-- Inline page-specific script -->
   <script>
-    async function init() {
-      await Auth.requireRole('employer', 'login.html');
-    }
+document.getElementById('post-job-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('post-btn');
+  btn.disabled = true;
+  btn.textContent = 'Posting…';
 
-    document.getElementById('post-job-form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const btn = document.getElementById('post-btn');
-      setLoading(btn, true, 'Posting…');
+  const payload = {
+    title: document.getElementById('title').value,
+    description: document.getElementById('description').value,
+    category: document.getElementById('category').value,
+    job_type: document.getElementById('job_type').value,
+    location: document.getElementById('location').value,
+    salary_min: document.getElementById('salary_min').value || 0,
+    salary_max: document.getElementById('salary_max').value || 0,
+    skills: document.getElementById('skills').value,
+  };
 
-      try {
-        const data = await api.post('jobs.php?action=create', {
-          title:       document.getElementById('title').value,
-          description: document.getElementById('description').value,
-          category:    document.getElementById('category').value,
-          job_type:    document.getElementById('job_type').value,
-          location:    document.getElementById('location').value,
-          salary_min:  document.getElementById('salary_min').value || 0,
-          salary_max:  document.getElementById('salary_max').value || 0,
-          skills:      document.getElementById('skills').value,
-        });
-        showAlert('#page-alert', 'Job posted successfully! Redirecting…', 'success');
-        setTimeout(() => window.location.href = 'employer-dashboard.html', 1500);
-      } catch (err) {
-        showAlert('#page-alert', err.message, 'error');
-        setLoading(btn, false);
-      }
+  try {
+    // Direct POST to create job
+    const res = await fetch('../../helper/api/jobs.php?action=create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    init();
-  </script>
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    alert('✅ Job posted successfully!');
+    window.location.href = 'employer-dashboard.html';
+  } catch (err) {
+    alert('Error: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = '🚀 Post Job';
+  }
+});
+</script>
 </body>
 </html>
