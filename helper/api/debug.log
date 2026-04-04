@@ -1,0 +1,5 @@
+
+---- NEW REQUEST ----
+Method: POST
+Action: create
+Input: {"title":"ERTYHT","description":"WERT","category":"Education","job_type":"full-time","location":"rtrg","salary_min":"8","salary_max":"96","skills":"WERT"}

@@ -1,221 +1,211 @@
-// =============================================================
-// ── DEV 2: Employer & Job Posting Functions ───────────────────
-// WRITTEN BY: Developer 2
-// Covers:
-//   - Job posting CRUD (create, read, update, delete)
-//   - Applicant review (view, accept, reject)
-//   - Employer dashboard rendering (stats, job table, applicant cards)
-// =============================================================
+// ============================================================
+//  Smart Job Portal — Frontend/js/app.js
+//  Fixed: API_BASE, api object, Auth, renderNav,
+//         setLoading, statusBadge, showAlert, formatSalary,
+//         formatDate, saveJob
+// ============================================================
 
-// ── Job Posting API Calls ─────────────────────────────────────
+const API_BASE = 'http://localhost:8080/job-portal-system/helper/api';
 
-// Create a new job posting (employer)
-async function createJob(jobData) {
-  return await api.post('jobs.php?action=create', jobData);
-}
+// ── HTTP helpers ──────────────────────────────────────────────────────────────
+const api = {
+    get(url) {
+        return fetch(`${API_BASE}/${url}`, {
+            credentials: 'include',
+        }).then(r => r.json());
+    },
+    post(url, data) {
+        return fetch(`${API_BASE}/${url}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        }).then(r => r.json());
+    },
+    put(url, data) {
+        return fetch(`${API_BASE}/${url}`, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        }).then(r => r.json());
+    },
+    delete(url) {
+        return fetch(`${API_BASE}/${url}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        }).then(r => r.json());
+    },
+};
 
-// Update an existing job posting (employer)
-async function updateJob(jobId, jobData) {
-  return await api.put(`jobs.php?action=update&id=${jobId}`, jobData);
-}
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+const Auth = {
+    getUser() {
+        try {
+            return JSON.parse(sessionStorage.getItem('user') || 'null');
+        } catch {
+            return null;
+        }
+    },
+    setUser(user) {
+        sessionStorage.setItem('user', JSON.stringify(user));
+    },
+    logout() {
+        sessionStorage.removeItem('user');
+    },
+    // Redirects to `redirectUrl` if not logged in or wrong role.
+    // Returns the user object on success, null otherwise.
+    requireRole(role, redirectUrl) {
+        const user = Auth.getUser();
+        if (!user) {
+            window.location.href = redirectUrl;
+            return null;
+        }
+        if (role && user.role !== role) {
+            window.location.href = redirectUrl;
+            return null;
+        }
+        return user;
+    },
+};
 
-// Delete a job posting (employer)
-async function deleteJob(jobId) {
-  return await api.delete(`jobs.php?action=delete&id=${jobId}`);
-}
+// ── Render navbar based on login state ───────────────────────────────────────
+function renderNav() {
+    const user    = Auth.getUser();
+    const links   = document.getElementById('nav-links');
+    const actions = document.getElementById('nav-actions');
+    if (!links || !actions) return;
 
-// Get all jobs posted by the currently logged-in employer
-async function getMyJobs() {
-  return await api.get('jobs.php?action=my');
-}
-
-// ── Applicant Review API Calls ────────────────────────────────
-
-// Get all applicants for a specific job (employer only)
-async function getJobApplicants(jobId) {
-  return await api.get(`applications.php?action=job&job_id=${jobId}`);
-}
-
-// Update application status: accepted / rejected / pending (employer only)
-async function updateApplicationStatus(appId, status) {
-  return await api.put(`applications.php?action=status&id=${appId}`, { status });
-}
-
-// ── Employer Dashboard Stats ──────────────────────────────────
-
-// Calculate and display the 4 stat numbers at the top of employer dashboard
-function renderEmployerStats(jobs) {
-  const total      = jobs.length;
-  const open       = jobs.filter(j => j.status === 'open').length;
-  const closed     = jobs.filter(j => j.status === 'closed').length;
-  const applicants = jobs.reduce((sum, j) => sum + Number(j.applicant_count), 0);
-
-  document.getElementById('stat-total').textContent      = total;
-  document.getElementById('stat-open').textContent       = open;
-  document.getElementById('stat-closed').textContent     = closed;
-  document.getElementById('stat-applicants').textContent = applicants;
-}
-
-// ── Employer Job Table Renderer ───────────────────────────────
-
-// Build the HTML table of all jobs posted by this employer
-function renderEmployerJobTable(jobs) {
-  if (!jobs.length) {
-    return `
-      <div class="empty-state">
-        <div class="icon">📋</div>
-        <h3>No jobs posted yet</h3>
-        <p>Create your first listing to start receiving applications</p>
-        <a href="post-job.html" class="btn btn-primary mt-16">Post a Job</a>
-      </div>`;
-  }
-
-  return `
-    <div class="table-wrap card" style="padding:0">
-      <table>
-        <thead>
-          <tr>
-            <th>Job Title</th>
-            <th>Type</th>
-            <th>Location</th>
-            <th>Salary</th>
-            <th>Applicants</th>
-            <th>Status</th>
-            <th>Posted</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${jobs.map(job => `
-            <tr>
-              <td>
-                <strong>${job.title}</strong>
-                ${job.category
-                  ? `<div class="text-muted" style="font-size:12px">${job.category}</div>`
-                  : ''}
-              </td>
-              <td><span class="badge badge-gray">${job.job_type}</span></td>
-              <td>${job.location || '—'}</td>
-              <td>${formatSalary(job.salary_min, job.salary_max)}</td>
-              <td><span class="badge badge-accent">${job.applicant_count}</span></td>
-              <td>${statusBadge(job.status)}</td>
-              <td class="text-muted">${formatDate(job.created_at)}</td>
-              <td>
-                <div style="display:flex; gap:6px">
-                  <button class="btn btn-sm btn-outline"
-                    onclick="openEditModal(${job.id})">Edit</button>
-                  <button class="btn btn-sm btn-danger"
-                    onclick="confirmDeleteJob(${job.id}, this)">Delete</button>
-                </div>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>`;
-}
-
-// ── Applicant Cards Renderer ──────────────────────────────────
-
-// Build the applicant review cards for a selected job
-function renderApplicantCards(applicants) {
-  if (!applicants.length) {
-    return `
-      <div class="empty-state">
-        <div class="icon">👥</div>
-        <h3>No applicants yet</h3>
-        <p>Share this job to attract candidates</p>
-      </div>`;
-  }
-
-  return `
-    <div class="jobs-grid">
-      ${applicants.map(a => `
-        <div class="card">
-          <div style="display:flex; justify-content:space-between;
-            align-items:flex-start; flex-wrap:wrap; gap:12px">
-            <div>
-              <div style="font-weight:700; font-size:16px">${a.name}</div>
-              <div class="text-sec" style="font-size:13px">
-                ${a.email}${a.phone ? ' · ' + a.phone : ''}
-              </div>
-              ${a.location
-                ? `<div class="text-muted" style="font-size:13px">📍 ${a.location}</div>`
-                : ''}
-              <div style="margin-top:8px; font-size:13px; color:var(--text-muted)">
-                Applied ${formatDate(a.applied_at)}
-              </div>
-            </div>
-            <div style="display:flex; flex-direction:column;
-              align-items:flex-end; gap:8px">
-              ${statusBadge(a.status)}
-              ${a.resume_path
-                ? `<a href="../${a.resume_path}" target="_blank"
-                    class="btn btn-outline btn-sm">📄 Resume</a>`
-                : '<span class="text-muted" style="font-size:12px">No resume</span>'}
-            </div>
-          </div>
-          ${a.cover_letter ? `
-            <div style="margin-top:12px; padding-top:12px;
-              border-top:1px solid var(--border);
-              font-size:13px; color:var(--text-sec)">
-              ${a.cover_letter}
-            </div>` : ''}
-          <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap">
-            <button class="btn btn-sm"
-              style="background:rgba(0,200,150,0.15); color:var(--green);
-                border:1px solid rgba(0,200,150,0.3)"
-              onclick="confirmStatusUpdate(${a.id}, 'accepted', this)">
-              ✓ Accept
-            </button>
-            <button class="btn btn-sm btn-danger"
-              onclick="confirmStatusUpdate(${a.id}, 'rejected', this)">
-              ✕ Reject
-            </button>
-            <button class="btn btn-sm btn-outline"
-              onclick="confirmStatusUpdate(${a.id}, 'pending', this)">
-              ⟳ Mark Pending
-            </button>
-          </div>
-        </div>
-      `).join('')}
-    </div>`;
-}
-
-// ── Button Action Handlers ────────────────────────────────────
-
-// Handle accept / reject / pending button click on applicant card
-async function confirmStatusUpdate(appId, status, btn) {
-  setLoading(btn, true, '…');
-  try {
-    await updateApplicationStatus(appId, status);
-    // Reload applicant list for the currently selected job
-    const jobId = document.getElementById('job-select')?.value;
-    if (jobId) {
-      const data = await getJobApplicants(jobId);
-      document.getElementById('applicants-list').innerHTML =
-        renderApplicantCards(data.applications);
+    if (!user) {
+        links.innerHTML = `
+            <a href="index.html">Home</a>
+            <a href="jobs.html">Jobs</a>
+            <a href="contact.html">Contact Us</a>`;
+        actions.innerHTML = `
+            <a href="login.html"    class="btn btn-outline btn-sm">Login</a>
+            <a href="register.html" class="btn btn-primary  btn-sm">Register</a>`;
+        return;
     }
-  } catch (err) {
-    alert(err.message);
-    setLoading(btn, false);
-  }
+
+    if (user.role === 'employer') {
+        links.innerHTML = `
+            <a href="employer-dashboard.html" class="active">Dashboard</a>
+            <a href="post-job.html">Post Job</a>`;
+        actions.innerHTML = `
+            <span style="font-size:13px;color:var(--text-sec);padding:0 8px">
+                ${escapeHtml(user.name)}
+            </span>
+            <button class="btn btn-outline btn-sm"
+                onclick="handleLogout()">Logout</button>`;
+    } else {
+        links.innerHTML = `
+            <a href="seeker-dashboard.html" class="active">Dashboard</a>
+            <a href="jobs.html">Browse Jobs</a>`;
+        actions.innerHTML = `
+            <span style="font-size:13px;color:var(--text-sec);padding:0 8px">
+                ${escapeHtml(user.name)}
+            </span>
+            <button class="btn btn-outline btn-sm"
+                onclick="handleLogout()">Logout</button>`;
+    }
 }
 
-// Handle delete job button click — confirms before deleting
-async function confirmDeleteJob(jobId, btn) {
-  if (!confirm('Delete this job posting? This cannot be undone.')) return;
-  setLoading(btn, true, '…');
-  try {
-    await deleteJob(jobId);
-    // Reload and re-render the full job table and stats
-    const data = await getMyJobs();
-    renderEmployerStats(data.jobs);
-    document.getElementById('jobs-list').innerHTML =
-      renderEmployerJobTable(data.jobs);
-  } catch (err) {
-    alert(err.message);
-    setLoading(btn, false);
-  }
+async function handleLogout() {
+    try {
+        await api.get('auth.php?action=logout');
+    } catch (_) { /* ignore */ }
+    Auth.logout();
+    window.location.href = 'login.html';
 }
 
+// ── UI Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * Show / hide a loading state on a button.
+ * Saves the original text so it can be restored.
+ */
+function setLoading(btn, loading, loadingText = 'Loading…') {
+    btn.disabled = loading;
+    if (loading) {
+        btn._originalText = btn.textContent;
+        btn.textContent   = loadingText;
+    } else {
+        btn.textContent = btn._originalText || 'Submit';
+    }
+}
+
+/**
+ * Show a temporary alert inside a container.
+ * containerRef can be a CSS selector string OR a DOM element.
+ */
+function showAlert(containerRef, message, type = 'info', timeout = 4000) {
+    const el = typeof containerRef === 'string'
+        ? document.querySelector(containerRef)
+        : containerRef;
+    if (!el) return;
+    el.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+    if (timeout) {
+        setTimeout(() => { el.innerHTML = ''; }, timeout);
+    }
+}
+
+/**
+ * Return an HTML badge string for a job or application status.
+ */
+function statusBadge(status) {
+    const map = {
+        open:     'badge-green',
+        closed:   'badge-gray',
+        pending:  'badge-yellow',
+        accepted: 'badge-green',
+        rejected: 'badge-red',
+    };
+    const cls   = map[status] || 'badge-gray';
+    const label = status
+        ? status.charAt(0).toUpperCase() + status.slice(1)
+        : '—';
+    return `<span class="badge ${cls}">${label}</span>`;
+}
+
+/**
+ * Format a salary range for display.
+ */
+function formatSalary(min, max) {
+    if (!min || min <= 0) return 'Competitive';
+    const fmt = n => '$' + Number(n).toLocaleString();
+    return max && max > 0 ? `${fmt(min)} – ${fmt(max)}` : `${fmt(min)}+`;
+}
+
+/**
+ * Format an ISO date string to a readable date.
+ */
+function formatDate(dateStr) {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString(undefined, {
+        year: 'numeric', month: 'short', day: 'numeric',
+    });
+}
+
+/**
+ * Escape HTML to prevent XSS when inserting user data into innerHTML.
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/**
+ * Save / unsave a job for the current seeker.
+ */
+async function saveJob(jobId) {
+    try {
+        const data = await api.post(`saved-jobs.php?action=toggle&job_id=${jobId}`, {});
+        if (data.error) { alert(data.error); return; }
+        alert(data.message);
+    } catch (e) {
+        alert('Could not save job. Please log in first.');
+    }
+}

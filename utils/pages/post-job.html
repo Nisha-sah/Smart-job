@@ -139,7 +139,7 @@ document.getElementById('post-job-form').addEventListener('submit', async e => {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    alert('✅ Job posted successfully!');
+    alert('Please log in as an employer first.');
     window.location.href = 'employer-dashboard.html';
   } catch (err) {
     alert('Error: ' + err.message);

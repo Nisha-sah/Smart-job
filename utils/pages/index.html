@@ -4,51 +4,306 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Job Portal — Find Your Dream Job</title>
- <link rel="stylesheet" href="../css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark:    #0d0f14;
+      --bg-card:    #161a22;
+      --bg-surface: #1e2330;
+      --accent:     #00d4aa;
+      --accent-dim: #00d4aa22;
+      --accent-hover: #00bfa0;
+      --text-pri:   #f0f2f7;
+      --text-sec:   #8b92a5;
+      --text-muted: #555e72;
+      --border:     #252c3d;
+      --red:        #ff4f6a;
+      --green:      #00c896;
+      --yellow:     #ffb74d;
+      --radius:     12px;
+      --radius-sm:  8px;
+      --shadow:     0 4px 24px rgba(0,0,0,0.4);
+      --transition: 0.18s cubic-bezier(.4,0,.2,1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-pri);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    h1,h2,h3,h4,h5 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-pri); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* NAVBAR */
+    .navbar {
+      background: rgba(13,15,20,0.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px; padding: 0 32px; max-width: 1200px; margin: 0 auto;
+    }
+    .logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px; font-weight: 800; color: var(--text-pri) !important; letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      color: var(--text-sec); font-size: 13px; font-weight: 500;
+      padding: 5px 12px; border-radius: var(--radius-sm);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text-pri); }
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 20px; border-radius: var(--radius-sm);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+      transition: var(--transition); white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-pri); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(160deg, #0a1628 0%, #0d1a2e 40%, #081512 100%);
+      padding: 70px 0 60px;
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(0,212,170,0.10), transparent);
+    }
+    .hero-content { position: relative; z-index: 1; }
+    .hero h1 {
+      font-size: clamp(32px, 4.5vw, 54px); font-weight: 800;
+      line-height: 1.15; margin-bottom: 10px; letter-spacing: -1px;
+    }
+    .hero h1 em { color: var(--accent); font-style: normal; }
+    .hero .subtitle {
+      font-size: 15px; color: var(--text-sec); max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    /* Search Bar */
+    .search-bar {
+      display: flex; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 50px;
+      padding: 5px 5px 5px 8px; max-width: 680px;
+      margin: 0 auto; gap: 0; align-items: center;
+    }
+    .search-bar input {
+      flex: 1; background: transparent; border: none;
+      padding: 9px 14px; color: var(--text-pri); font-size: 14px; outline: none;
+    }
+    .search-bar input::placeholder { color: var(--text-muted); }
+    .search-bar .sep {
+      width: 1px; height: 22px; background: var(--border); flex-shrink: 0;
+    }
+    .search-bar .btn { border-radius: 40px; padding: 9px 24px; font-size: 14px; }
+
+    /* STATS */
+    .stats-section {
+      padding: 32px 0; border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 16px; max-width: 700px; margin: 0 auto;
+    }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 24px; text-align: center;
+    }
+    .stat-value {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 28px; font-weight: 800; color: var(--accent);
+      line-height: 1; margin-bottom: 4px;
+    }
+    .stat-label { font-size: 12px; color: var(--text-sec); }
+
+    /* MAIN CONTENT */
+    main { padding: 32px 0 0; }
+
+    .section-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      margin-bottom: 20px;
+    }
+    .section-header h2 { font-size: 22px; font-weight: 800; }
+    .section-header p  { font-size: 13px; color: var(--text-sec); margin-top: 2px; }
+
+    /* JOB LIST — matches screenshot: list rows with logo, info, badge, button */
+    .jobs-list { display: flex; flex-direction: column; gap: 0; }
+
+    .job-group-label {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      padding: 16px 0 8px;
+    }
+
+    .job-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 8px;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .job-row:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+    .job-logo {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--bg-surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--accent);
+      flex-shrink: 0; font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+    }
+    .job-logo img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .job-info { flex: 1; min-width: 0; }
+    .job-category-pill {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: 20px;
+      background: var(--accent-dim); color: var(--accent);
+      letter-spacing: 0.3px; margin-bottom: 4px; text-transform: uppercase;
+    }
+    .job-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--text-pri);
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .job-company { font-size: 12px; color: var(--text-sec); margin-bottom: 6px; }
+    .job-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .job-meta span { display: flex; align-items: center; gap: 3px; }
+
+    .job-actions {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 8px; flex-shrink: 0;
+    }
+    .status-badge {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px; white-space: nowrap;
+    }
+    .status-ready    { background: rgba(0,200,150,0.12); color: var(--green); }
+    .status-onsite   { background: rgba(0,212,170,0.12); color: var(--accent); }
+    .status-remote   { background: rgba(255,183,77,0.12); color: var(--yellow); }
+    .status-hybrid   { background: rgba(255,79,106,0.12); color: var(--red); }
+
+    /* CTA */
+    .cta-section {
+      margin-top: 48px; padding: 60px 0;
+      background: var(--bg-card); border-top: 1px solid var(--border);
+      text-align: center;
+    }
+    .cta-section h2 { font-size: 28px; font-weight: 800; margin-bottom: 10px; }
+    .cta-section p  { color: var(--text-sec); margin-bottom: 28px; }
+
+    /* FOOTER — 3 columns matching screenshot */
+    footer {
+      background: #0a0c10; border-top: 1px solid var(--border);
+      padding: 48px 0 24px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px; margin-bottom: 36px;
+    }
+    .footer-brand .logo { display: block; margin-bottom: 12px; font-size: 20px; }
+    .footer-brand p { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+    .footer-col h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px; font-weight: 700; color: var(--text-pri);
+      margin-bottom: 14px;
+    }
+    .footer-col a {
+      display: block; font-size: 13px; color: var(--text-muted);
+      margin-bottom: 8px; transition: color var(--transition);
+    }
+    .footer-col a:hover { color: var(--text-sec); }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .footer-bottom-links { display: flex; gap: 16px; }
+    .footer-bottom-links a { color: var(--text-muted); font-size: 12px; }
+    .footer-bottom-links a:hover { color: var(--text-sec); }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .job-row { flex-wrap: wrap; }
+    }
+    @media (max-width: 500px) {
+      .search-bar { flex-direction: column; border-radius: var(--radius); padding: 8px; }
+      .search-bar .sep { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body class="page-wrapper">
+<body>
 
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-inner">
-      <a href="index.html" class="logo">Job<span>Portal</span></a>
-      <div class="nav-links" id="nav-links"></div>
-      <div class="nav-actions" id="nav-actions"></div>
+      <a href="#" class="logo">Job<span>Portal</span></a>
+      <div class="nav-links">
+        <div class="nav-links">
+  <a href="#" class="active">Home</a>
+  <a href="jobs.html" class="btn btn-outline btn-sm">Jobs</a>
+  <a href="contact.html">Contact Us</a>
+</div>
+      </div>
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Register</a>
+      </div>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
     <div class="container hero-content">
-      <h1>Find Your <em>Dream Job</em><br>Today</h1>
-      <p>Connect with top employers and discover opportunities that match your skills and ambitions.</p>
+      <h1>Find Your <em>Dream Job Today!</em></h1>
+      <p class="subtitle">Connect Talent with Opportunity. Your Gateway to Career Success.</p>
       <div class="search-bar">
-        <input type="text" id="search-keyword" placeholder="Job title, skills, or keywords…">
-        <input type="text" id="search-location" placeholder="Location" style="max-width:180px">
-        <button class="btn btn-primary" onclick="searchJobs()">Search Jobs</button>
+        <input type="text" id="search-keyword" placeholder="Job title or Company…">
+        <div class="sep"></div>
+        <input type="text" id="search-location" placeholder="Location" style="max-width:160px">
+        <button class="btn btn-primary" onclick="searchJobs()">🔍 Search</button>
       </div>
     </div>
   </section>
 
   <!-- STATS -->
-  <section style="padding: 40px 0; border-bottom: 1px solid var(--border)">
+  <section class="stats-section">
     <div class="container">
       <div class="stats-grid">
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-jobs">—</div>
+        <div class="stat-card">
+          <div class="stat-value">30,460</div>
           <div class="stat-label">Active Job Listings</div>
         </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-seekers">—</div>
+        <div class="stat-card">
+          <div class="stat-value">50,236</div>
           <div class="stat-label">Registered Job Seekers</div>
         </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-employers">—</div>
+        <div class="stat-card">
+          <div class="stat-value">10,460</div>
           <div class="stat-label">Companies Hiring</div>
-        </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-placed">—</div>
-          <div class="stat-label">Successful Placements</div>
         </div>
       </div>
     </div>
@@ -57,89 +312,193 @@
   <!-- RECENT JOBS -->
   <main>
     <div class="container">
-      <div class="flex-between mb-24">
+      <div class="section-header">
         <div>
-          <h2 style="font-size:24px; font-weight:800">Recent Jobs Available</h2>
-          <p class="text-sec mt-8">Freshly posted opportunities waiting for you</p>
+          <h2>Recent Jobs Available</h2>
+          <p>Freshly posted opportunities waiting for you</p>
         </div>
-        <a href="jobs.html" class="btn btn-outline">View All →</a>
+       <a href="jobs.html" class="btn btn-outline btn-sm">View All →</a>
       </div>
 
-      <div id="jobs-list" class="jobs-grid">
-        <div class="loader"></div>
-      </div>
+      <div class="jobs-list" id="jobs-list">
+
+        <!-- Group: Strategy -->
+        <div class="job-group-label">Strategy</div>
+
+        <div class="job-row">
+          <div class="job-logo" style="background:#1a2436; color:#60a5fa;">FO</div>
+          <div class="job-info">
+            <div class="job-category-pill">Strategy</div>
+            <div class="job-title">Forward Security Director</div>
+            <div class="job-company">Mohr, Christiansen LLC</div>
+            <div class="job-meta">
+              <span>Healthcare</span>
+              <span>Full Time</span>
+              <span> $89K–$95K</span>
+              <span>New York, NY</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <span class="status-badge status-ready">Job Ready</span>
+            <a href="#" class="btn btn-primary btn-sm">View Job</a>
+          </div>
+        </div>
+
+        <!-- Group: Marketing -->
+        <div class="job-group-label">Marketing</div>
+
+        <div class="job-row">
+          <div class="job-logo" style="background:#1a2c20; color:#34d399;">RC</div>
+          <div class="job-info">
+            <div class="job-category-pill" style="background:rgba(52,211,153,0.1); color:#34d399;">Marketing</div>
+            <div class="job-title">Regional Creative Facilitator</div>
+            <div class="job-company">Paucek — Lindgren Group</div>
+            <div class="job-meta">
+              <span>Media</span>
+              <span>Part Time</span>
+              <span>$49K–$55K</span>
+              <span> GOOGLE</span>
+              <span>Los Angeles, CA</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <span class="status-badge status-onsite">On-Site</span>
+            <a href="#" class="btn btn-primary btn-sm">View Job</a>
+          </div>
+        </div>
+
+        <!-- Group: Technology -->
+        <div class="job-group-label">Technology</div>
+
+        <div class="job-row">
+          <div class="job-logo" style="background:#1e1a30; color:#a78bfa;">II</div>
+          <div class="job-info">
+            <div class="job-category-pill" style="background:rgba(167,139,250,0.1); color:#a78bfa;">Technology</div>
+            <div class="job-title">Internal Integration Planner</div>
+            <div class="job-company">Price, Gutpetz and Vile</div>
+            <div class="job-meta">
+              <span> Operations</span>
+              <span> Analytics</span>
+              <span> $45K–$50K</span>
+              <span>Texas, US</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <span class="status-badge status-ready">Job Ready</span>
+            <a href="#" class="btn btn-primary btn-sm">View Job</a>
+          </div>
+        </div>
+
+        <!-- Group: Leadership -->
+        <div class="job-group-label">Leadership</div>
+
+        <div class="job-row">
+          <div class="job-logo" style="background:#1a1e30; color:#60a5fa;">DI</div>
+          <div class="job-info">
+            <div class="job-category-pill" style="background:rgba(96,165,250,0.1); color:#60a5fa;">Leadership</div>
+            <div class="job-title">District Intranet Director</div>
+            <div class="job-company">Smitham — Melvin Inc</div>
+            <div class="job-meta">
+              <span> Finance</span>
+              <span> Full Time</span>
+              <span> $55K–$80K</span>
+              <span> Dallas, TX</span>
+              <span> Facilities Arts</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <span class="status-badge status-remote">Remote</span>
+            <a href="#" class="btn btn-primary btn-sm">View Job</a>
+          </div>
+        </div>
+
+        <!-- Group: Strategy -->
+        <div class="job-group-label">Strategy</div>
+
+        <div class="job-row">
+          <div class="job-logo" style="background:#1e1a18; color:#fbbf24;">CT</div>
+          <div class="job-info">
+            <div class="job-category-pill" style="background:rgba(251,191,36,0.1); color:#fbbf24;">Strategy</div>
+            <div class="job-title">Corporate Tactics Facilitator</div>
+            <div class="job-company">Larson and Ferris LLP</div>
+            <div class="job-meta">
+              <span> Consulting</span>
+              <span> Full Time</span>
+              <span> $75K–$90K</span>
+              <span> Denver, CO</span>
+            </div>
+          </div>
+          <div class="job-actions">
+            <span class="status-badge status-onsite">On-Site</span>
+            <a href="#" class="btn btn-primary btn-sm">View Job</a>
+          </div>
+        </div>
+
+      </div><!-- /jobs-list -->
     </div>
   </main>
 
   <!-- CTA -->
-  <section style="padding: 80px 0; background: var(--bg-card); border-top: 1px solid var(--border)">
-    <div class="container text-center">
-      <h2 style="font-size:32px; font-weight:800; margin-bottom:12px">Ready to hire top talent?</h2>
-      <p class="text-sec" style="margin-bottom:32px">Post your job and reach thousands of qualified candidates</p>
-      <a href="register.html?role=employer" class="btn btn-primary" style="padding:14px 40px; font-size:16px">
-        Post a Job — It's Free
-      </a>
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to hire top talent?</h2>
+      <p>Post your job and reach thousands of qualified candidates</p>
+      <a href="#" class="btn btn-primary" style="padding:12px 36px; font-size:15px">Post a Job — It's Free</a>
     </div>
   </section>
 
-  <footer style="padding:24px; text-align:center; color:var(--text-muted); font-size:13px; border-top:1px solid var(--border)">
-    © 2025 Smart Job Portal. All rights reserved.
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="logo">Job<span>Portal</span></a>
+          <p>Quis ante lacinia quam velit volutpat ipsum dolor. Eget malesuada faucibus. Congue eget malesuada faucibus risus.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Job</h4>
+          <a href="#">About Us</a>
+          <a href="#">Our Jobs</a>
+          <a href="#">Blog</a>
+          <a href="#">Contact Us</a>
+          <a href="#">For Employers</a>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <a href="#">About Us</a>
+          <a href="#">Our Team</a>
+          <a href="#">Careers</a>
+          <a href="#">Press</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Job Categories</h4>
+          <a href="#">Technology</a>
+          <a href="#">Marketing</a>
+          <a href="#">Design</a>
+          <a href="#">Finance</a>
+          <a href="#">Research</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Smart Job Portal</span>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms &amp; Conditions</a>
+        </div>
+      </div>
+    </div>
   </footer>
 
-  <script src="js/app.js"></script>
   <script>
-    async function loadJobs() {
-      const list = document.getElementById('jobs-list');
-      try {
-        const data = await api.get('jobs.php?action=list');
-        const jobs = data.jobs.slice(0, 6);
-        if (!jobs.length) {
-          list.innerHTML = '<div class="empty-state"><div class="icon">💼</div><h3>No jobs posted yet</h3><p>Check back soon!</p></div>';
-          return;
-        }
-        list.innerHTML = jobs.map(job => `
-          <div class="card card-hover">
-            <div class="job-card">
-              <div class="job-card-logo">🏢</div>
-              <div class="job-card-body">
-                <div class="job-card-title">${job.title}</div>
-                <div class="job-card-company">${job.employer_name}</div>
-                <div class="job-card-meta">
-                  <span>📍 ${job.location || 'Remote'}</span>
-                  <span>💼 ${job.job_type}</span>
-                  <span>💰 ${formatSalary(job.salary_min, job.salary_max)}</span>
-                  ${job.category ? `<span>🏷 ${job.category}</span>` : ''}
-                </div>
-              </div>
-              <div class="job-card-actions">
-                ${statusBadge(job.status)}
-                <a href="job-detail.html?id=${job.id}" class="btn btn-primary btn-sm">View Job</a>
-              </div>
-            </div>
-          </div>
-        `).join('');
-      } catch {
-        list.innerHTML = '<div class="alert alert-error">Failed to load jobs.</div>';
-      }
-    }
-
     function searchJobs() {
       const kw  = document.getElementById('search-keyword').value;
       const loc = document.getElementById('search-location').value;
       window.location.href = `jobs.html?keyword=${encodeURIComponent(kw)}&location=${encodeURIComponent(loc)}`;
     }
-
     document.getElementById('search-keyword').addEventListener('keydown', e => {
       if (e.key === 'Enter') searchJobs();
     });
-
-    // Fake stats for now (replace with real API later)
-    document.getElementById('stat-jobs').textContent = '—';
-    document.getElementById('stat-seekers').textContent = '—';
-    document.getElementById('stat-employers').textContent = '—';
-    document.getElementById('stat-placed').textContent = '—';
-
-    loadJobs();
   </script>
 </body>
 </html>

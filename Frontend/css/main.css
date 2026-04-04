@@ -355,7 +355,7 @@ textarea.form-control { resize: vertical; min-height: 100px; }
 .tab:hover { color: var(--text-pri); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* â”€â”€ Tables â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th {
@@ -371,7 +371,7 @@ td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid rgba(37,44,61
 tr:last-child td { border-bottom: none; }
 tr:hover td { background: rgba(255,255,255,0.02); }
 
-/* â”€â”€ Notifications Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+
 .notif-panel {
   position: absolute;
   top: calc(100% + 8px);
