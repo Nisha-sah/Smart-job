@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans','Segoe UI',sans-serif; background: #eef0f4; min-height: 100vh; }
+
+        nav {
+            background: #0984e3; padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
+        }
+        nav .brand { color: white; font-weight: 700; font-size: 1.1rem; }
+        nav .nav-links { display: flex; gap: 6px; }
+        nav a {
+            color: rgba(255,255,255,0.85); text-decoration: none;
+            padding: 6px 13px; border-radius: 6px; font-size: 0.86rem; font-weight: 500;
+            transition: background 0.2s;
+        }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.2); color: white; }
+
+        .page { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+
+        /* STATS */
+        .stats-bar { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .stat-card {
+            background: white; border-radius: 10px; padding: 16px 22px;
+            flex: 1; min-width: 110px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .stat-num { font-size: 1.8rem; font-weight: 700; color: #0984e3; }
+        .stat-label { font-size: 0.75rem; color: #888; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .stat-card.s-pending  .stat-num { color: #856404; }
+        .stat-card.s-reviewed .stat-num { color: #004085; }
+        .stat-card.s-accepted .stat-num { color: #155724; }
+        .stat-card.s-rejected .stat-num { color: #721c24; }
+
+        /* TOOLBAR */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .toolbar h2 { font-size: 1.05rem; font-weight: 700; color: #333; }
+        .toolbar-right { display: flex; gap: 10px; align-items: center; }
+        .filter-select {
+            padding: 8px 12px; border: 1.5px solid #dde1e7; border-radius: 7px;
+            font-family: inherit; font-size: 0.88rem; color: #333; outline: none;
+            background: white; cursor: pointer;
+        }
+        .filter-select:focus { border-color: #0984e3; }
+        .refresh-btn {
+            background: #0984e3; color: white; border: none; padding: 8px 16px;
+            border-radius: 7px; font-family: inherit; font-size: 0.88rem; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.2s;
+        }
+        .refresh-btn:hover { background: #076bbf; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .refresh-btn.spinning .spin-icon { display: inline-block; animation: spin 0.7s linear infinite; }
+
+        /* APP CARDS */
+        #status-list { display: flex; flex-direction: column; gap: 12px; }
+        .app-card {
+            background: white; padding: 18px 20px; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+            border-left: 4px solid #dde1e7; transition: box-shadow 0.2s;
+        }
+        .app-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.11); }
+        .app-card.b-pending  { border-left-color: #ffc107; }
+        .app-card.b-reviewed { border-left-color: #0984e3; }
+        .app-card.b-accepted { border-left-color: #00b894; }
+        .app-card.b-rejected { border-left-color: #d63031; }
+        .app-info strong { font-size: 0.97rem; color: #222; display: block; margin-bottom: 4px; }
+        .app-info small  { color: #777; font-size: 0.82rem; }
+        .app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+        .status {
+            padding: 5px 13px; border-radius: 20px;
+            font-size: 0.76rem; font-weight: 600; text-transform: capitalize;
+        }
+        .status-pending  { background: #fff3cd; color: #856404; }
+        .status-reviewed { background: #cce5ff; color: #004085; }
+        .status-accepted { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .app-date { font-size: 0.76rem; color: #aaa; }
+        .resume-link { font-size: 0.78rem; color: #0984e3; text-decoration: none; }
+        .resume-link:hover { text-decoration: underline; }
+
+        .empty-state { text-align: center; padding: 60px 20px; color: #aaa; }
+        .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+        .refresh-info { font-size: 0.76rem; color: #bbb; text-align: right; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="brand">🧠 Smart Job Portal</span>
+        <div class="nav-links">
+            <a href="index.html">🔍 Jobs</a>
+            <a href="my_applications.html" class="active">📋 My Applications</a>
+            <a href="resume.html">📄 My Resume</a>
+            <a href="employer.html">🏢 Employer Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="stats-bar">
+            <div class="stat-card"><div class="stat-num" id="stat-total">—</div><div class="stat-label">Total</div></div>
+            <div class="stat-card s-pending"><div class="stat-num" id="stat-pending">—</div><div class="stat-label">Pending</div></div>
+            <div class="stat-card s-reviewed"><div class="stat-num" id="stat-reviewed">—</div><div class="stat-label">Reviewed</div></div>
+            <div class="stat-card s-accepted"><div class="stat-num" id="stat-accepted">—</div><div class="stat-label">Accepted</div></div>
+            <div class="stat-card s-rejected"><div class="stat-num" id="stat-rejected">—</div><div class="stat-label">Rejected</div></div>
+        </div>
+
+        <div class="toolbar">
+            <h2>Application History</h2>
+            <div class="toolbar-right">
+                <select class="filter-select" id="status-filter" onchange="applyFilter()">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="reviewed">Reviewed</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <button class="refresh-btn" id="refresh-btn" onclick="loadApplications(true)">
+                    <span class="spin-icon">🔄</span> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div id="status-list">
+            <div class="empty-state"><div class="icon">⏳</div><p>Loading your applications...</p></div>
+        </div>
+        <div class="refresh-info" id="last-updated"></div>
+    </div>
+
+    <script>
+        let allApps = [];
+
+        async function loadApplications(manual = false) {
+            const btn = document.getElementById('refresh-btn');
+            btn.classList.add('spinning');
+            try {
+                const res = await fetch('my_applications.php?user_id=1');
+                if (!res.ok) throw new Error('Server error');
+                allApps = await res.json();
+                updateStats(allApps);
+                applyFilter();
+                document.getElementById('last-updated').textContent =
+                    'Last updated: ' + new Date().toLocaleTimeString();
+            } catch (e) {
+                document.getElementById('status-list').innerHTML =
+                    '<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load. Check server connection.</p></div>';
+            } finally {
+                btn.classList.remove('spinning');
+            }
+        }
+
+        function updateStats(apps) {
+            document.getElementById('stat-total').textContent    = apps.length;
+            document.getElementById('stat-pending').textContent  = apps.filter(a => a.status === 'pending').length;
+            document.getElementById('stat-reviewed').textContent = apps.filter(a => a.status === 'reviewed').length;
+            document.getElementById('stat-accepted').textContent = apps.filter(a => a.status === 'accepted').length;
+            document.getElementById('stat-rejected').textContent = apps.filter(a => a.status === 'rejected').length;
+        }
+
+        function applyFilter() {
+            const f = document.getElementById('status-filter').value;
+            renderApps(f ? allApps.filter(a => a.status === f) : allApps);
+        }
+
+        function renderApps(apps) {
+            const c = document.getElementById('status-list');
+            if (!apps.length) {
+                c.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No applications found.</p></div>';
+                return;
+            }
+            c.innerHTML = apps.map(app => {
+                const date = app.applied_at
+                    ? new Date(app.applied_at).toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' })
+                    : 'N/A';
+                const resumeHtml = app.resume_path
+                    ? `<a class="resume-link" href="${app.resume_path}" target="_blank">📎 View Resume</a>`
+                    : '';
+                return `
+                <div class="app-card b-${app.status}">
+                    <div class="app-info">
+                        <strong>${app.title}</strong>
+                        <small>📍 ${app.location}</small>
+                    </div>
+                    <div class="app-right">
+                        <span class="status status-${app.status}">${app.status}</span>
+                        <span class="app-date">Applied: ${date}</span>
+                        ${resumeHtml}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        window.onload = () => {
+            loadApplications();
+            setInterval(loadApplications, 30000); // auto-refresh every 30s
+        };
+    </script>
+</body>
+</html>

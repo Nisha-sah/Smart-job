@@ -2,37 +2,104 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Job Search Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Job Portal</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 40px; }
-        .filter-card { background: white; padding: 25px; border-radius: 12px; display: flex; gap: 15px; flex-wrap: wrap; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 30px; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; min-width: 150px; }
-        #search-btn { background: #00b894; color: white; border: none; padding: 12px 25px; cursor: pointer; border-radius: 6px; font-weight: bold; }
-        .job-card { background: white; padding: 20px; margin-bottom: 15px; border-radius: 10px; border-left: 6px solid #0984e3; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .fav-btn { background: #ff7675; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; }
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans','Segoe UI',sans-serif; background: #eef0f4; min-height: 100vh; }
+
+        nav {
+            background: #0984e3; padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
+        }
+        nav .brand { color: white; font-weight: 700; font-size: 1.1rem; }
+        nav .nav-links { display: flex; gap: 6px; }
+        nav a {
+            color: rgba(255,255,255,0.85); text-decoration: none;
+            padding: 6px 13px; border-radius: 6px; font-size: 0.86rem; font-weight: 500;
+            transition: background 0.2s;
+        }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.2); color: white; }
+
+        .page { max-width: 1050px; margin: 0 auto; padding: 28px 20px; }
+        .page-title { font-size: 1.4rem; font-weight: 700; color: #222; margin-bottom: 20px; }
+
+        .filter-card {
+            background: white; padding: 20px; border-radius: 12px;
+            display: flex; gap: 12px; flex-wrap: wrap;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 24px;
+        }
+        .filter-card input, .filter-card select {
+            padding: 10px 12px; border: 1.5px solid #dde1e7; border-radius: 7px;
+            font-family: inherit; font-size: 0.9rem; flex: 1; min-width: 140px;
+            outline: none; transition: border-color 0.2s;
+        }
+        .filter-card input:focus, .filter-card select:focus { border-color: #0984e3; }
+        #search-btn {
+            background: #0984e3; color: white; border: none;
+            padding: 10px 22px; border-radius: 7px; font-family: inherit;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        #search-btn:hover { background: #076bbf; }
+
+        .job-card {
+            background: white; padding: 18px 20px; margin-bottom: 14px;
+            border-radius: 10px; border-left: 5px solid #0984e3;
+            display: flex; justify-content: space-between; align-items: center; gap: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: box-shadow 0.2s;
+        }
+        .job-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.11); }
+        .job-card h3 { margin: 0 0 4px; color: #0984e3; font-size: 1rem; }
+        .job-card small { color: #666; font-size: 0.82rem; }
+        .btn-group { display: flex; gap: 8px; flex-shrink: 0; }
+        .fav-btn {
+            background: white; border: 1.5px solid #dde1e7; padding: 8px 14px;
+            border-radius: 7px; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+        }
+        .fav-btn:hover { border-color: #e84393; background: #fff0f7; }
+        .apply-btn {
+            background: #00b894; color: white; border: none;
+            padding: 8px 18px; border-radius: 7px; cursor: pointer;
+            font-size: 0.88rem; font-weight: 600; font-family: inherit; transition: background 0.2s;
+        }
+        .apply-btn:hover { background: #00a381; }
     </style>
 </head>
 <body>
-    <h2>Find Your Dream Job</h2>
-    <div class="filter-card">
-        <input type="text" id="keyword" placeholder="Job title...">
-        <input type="text" id="location" placeholder="Location...">
-        <select id="category">
-            <option value="">Categories</option>
-            <option value="IT">IT</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Design">Design</option>
-        </select>
-        <select id="job_type">
-            <option value="">Job Type</option>
-            <option value="Full-time">Full-time</option>
-            <option value="Remote">Remote</option>
-            <option value="Contract">Contract</option>
-        </select>
-        <input type="number" id="min_salary" placeholder="Min Salary ($)">
-        <button id="search-btn" onclick="fetchJobs()">Search Jobs</button>
+    <nav>
+        <span class="brand">🧠 Smart Job Portal</span>
+        <div class="nav-links">
+            <a href="index.html" class="active">🔍 Jobs</a>
+            <a href="my_applications.html">📋 My Applications</a>
+            <a href="resume.html">📄 My Resume</a>
+            <a href="employer.html">🏢 Employer Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-title">Find Your Dream Job</div>
+        <div class="filter-card">
+            <input type="text" id="keyword" placeholder="Job title or keyword...">
+            <input type="text" id="location" placeholder="Location...">
+            <select id="category">
+                <option value="">All Categories</option>
+                <option value="IT">IT</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Design">Design</option>
+            </select>
+            <select id="job_type">
+                <option value="">All Types</option>
+                <option value="Full-time">Full-time</option>
+                <option value="Remote">Remote</option>
+                <option value="Contract">Contract</option>
+            </select>
+            <input type="number" id="min_salary" placeholder="Min Salary ($)">
+            <button id="search-btn" onclick="fetchJobs()">Search Jobs</button>
+        </div>
+        <div id="job-list"><p style="color:#aaa;">Loading jobs...</p></div>
     </div>
-    <div id="job-list"></div>
+
     <script src="script.js"></script>
 </body>
 </html>

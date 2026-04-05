@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans','Segoe UI',sans-serif; background: #eef0f4; min-height: 100vh; }
+
+        nav {
+            background: #0984e3; padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
+        }
+        nav .brand { color: white; font-weight: 700; font-size: 1.1rem; }
+        nav .nav-links { display: flex; gap: 6px; }
+        nav a {
+            color: rgba(255,255,255,0.85); text-decoration: none;
+            padding: 6px 13px; border-radius: 6px; font-size: 0.86rem; font-weight: 500;
+            transition: background 0.2s;
+        }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.2); color: white; }
+
+        .page { max-width: 1000px; margin: 0 auto; padding: 28px 20px; }
+        .page-title { font-size: 1.4rem; font-weight: 700; color: #222; margin-bottom: 6px; }
+        .page-sub { color: #888; font-size: 0.9rem; margin-bottom: 24px; }
+
+        /* JOB SELECTOR */
+        .job-selector {
+            background: white; padding: 18px 20px; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 24px;
+            display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        }
+        .job-selector label { font-weight: 600; font-size: 0.92rem; color: #333; }
+        .job-selector select {
+            padding: 9px 12px; border: 1.5px solid #dde1e7; border-radius: 7px;
+            font-family: inherit; font-size: 0.9rem; color: #333; outline: none;
+            flex: 1; min-width: 200px; transition: border-color 0.2s;
+        }
+        .job-selector select:focus { border-color: #0984e3; }
+        .load-btn {
+            background: #0984e3; color: white; border: none; padding: 9px 20px;
+            border-radius: 7px; font-family: inherit; font-size: 0.9rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .load-btn:hover { background: #076bbf; }
+
+        /* STATS */
+        .stats-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .stat-card {
+            background: white; border-radius: 10px; padding: 14px 20px;
+            flex: 1; min-width: 100px; text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .stat-num { font-size: 1.6rem; font-weight: 700; color: #0984e3; }
+        .stat-label { font-size: 0.74rem; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+        /* APPLICATION TABLE */
+        #app-table-wrap { display: none; }
+        .table-title { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 12px; }
+        .app-row {
+            background: white; padding: 16px 20px; margin-bottom: 12px;
+            border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 16px; flex-wrap: wrap;
+            border-left: 4px solid #dde1e7; transition: box-shadow 0.2s;
+        }
+        .app-row:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.10); }
+        .app-row.b-pending  { border-left-color: #ffc107; }
+        .app-row.b-reviewed { border-left-color: #0984e3; }
+        .app-row.b-accepted { border-left-color: #00b894; }
+        .app-row.b-rejected { border-left-color: #d63031; }
+
+        .app-info strong { font-size: 0.95rem; color: #222; display: block; margin-bottom: 3px; }
+        .app-info small  { color: #777; font-size: 0.82rem; display: block; margin-bottom: 4px; }
+        .cover-text {
+            font-size: 0.82rem; color: #555; margin-top: 6px;
+            background: #f7f8fa; padding: 8px 10px; border-radius: 6px;
+            max-width: 420px; line-height: 1.5;
+        }
+
+        .app-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+        .status {
+            padding: 5px 13px; border-radius: 20px;
+            font-size: 0.76rem; font-weight: 600; text-transform: capitalize;
+        }
+        .status-pending  { background: #fff3cd; color: #856404; }
+        .status-reviewed { background: #cce5ff; color: #004085; }
+        .status-accepted { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+
+        .action-btns { display: flex; gap: 6px; }
+        .btn-accept {
+            background: #00b894; color: white; border: none; padding: 6px 14px;
+            border-radius: 6px; font-family: inherit; font-size: 0.82rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-accept:hover { background: #00a381; }
+        .btn-review {
+            background: #0984e3; color: white; border: none; padding: 6px 14px;
+            border-radius: 6px; font-family: inherit; font-size: 0.82rem;
+            font-weight: 600; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-review:hover { background: #076bbf; }
+        .btn-reject {
+            background: white; color: #d63031; border: 1.5px solid #d63031;
+            padding: 6px 14px; border-radius: 6px; font-family: inherit;
+            font-size: 0.82rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-reject:hover { background: #fff5f5; }
+        .resume-link { font-size: 0.78rem; color: #0984e3; text-decoration: none; }
+        .resume-link:hover { text-decoration: underline; }
+
+        .empty-state { text-align: center; padding: 50px; color: #aaa; }
+        .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: #222; color: white; padding: 12px 20px;
+            border-radius: 8px; font-size: 0.88rem; font-weight: 500;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="brand">🧠 Smart Job Portal</span>
+        <div class="nav-links">
+            <a href="index.html">🔍 Jobs</a>
+            <a href="my_applications.html">📋 My Applications</a>
+            <a href="resume.html">📄 My Resume</a>
+            <a href="employer.html" class="active">🏢 Employer Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-title">🏢 Employer Dashboard</div>
+        <p class="page-sub">Review applications for your job listings and manage your hiring pipeline.</p>
+
+        <!-- Job Selector -->
+        <div class="job-selector">
+            <label for="job-select">Select Job:</label>
+            <select id="job-select">
+                <option value="">— Choose a job listing —</option>
+            </select>
+            <button class="load-btn" onclick="loadApplications()">Load Applications</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar" id="stats-bar" style="display:none;">
+            <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
+            <div class="stat-card"><div class="stat-num" id="s-pending">0</div><div class="stat-label">Pending</div></div>
+            <div class="stat-card"><div class="stat-num" id="s-reviewed">0</div><div class="stat-label">Reviewed</div></div>
+            <div class="stat-card"><div class="stat-num" id="s-accepted">0</div><div class="stat-label">Accepted</div></div>
+            <div class="stat-card"><div class="stat-num" id="s-rejected">0</div><div class="stat-label">Rejected</div></div>
+        </div>
+
+        <!-- Applications List -->
+        <div id="app-table-wrap">
+            <div class="table-title">Applications</div>
+            <div id="app-list"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Load jobs into dropdown
+        async function loadJobs() {
+            try {
+                const res  = await fetch('search.php?keyword=&location=&category=&type=&salary=');
+                const jobs = await res.json();
+                const sel  = document.getElementById('job-select');
+                jobs.forEach(j => {
+                    const opt   = document.createElement('option');
+                    opt.value   = j.id;
+                    opt.textContent = `${j.title} — ${j.location}`;
+                    sel.appendChild(opt);
+                });
+            } catch (e) { console.error('Failed to load jobs', e); }
+        }
+
+        async function loadApplications() {
+            const jobId = document.getElementById('job-select').value;
+            if (!jobId) { showToast('Please select a job first.'); return; }
+
+            try {
+                const res  = await fetch(`employer_applications.php?job_id=${jobId}`);
+                const apps = await res.json();
+
+                // Stats
+                document.getElementById('stats-bar').style.display = 'flex';
+                document.getElementById('s-total').textContent    = apps.length;
+                document.getElementById('s-pending').textContent  = apps.filter(a=>a.status==='pending').length;
+                document.getElementById('s-reviewed').textContent = apps.filter(a=>a.status==='reviewed').length;
+                document.getElementById('s-accepted').textContent = apps.filter(a=>a.status==='accepted').length;
+                document.getElementById('s-rejected').textContent = apps.filter(a=>a.status==='rejected').length;
+
+                const wrap = document.getElementById('app-table-wrap');
+                const list = document.getElementById('app-list');
+                wrap.style.display = 'block';
+
+                if (!apps.length) {
+                    list.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No applications yet for this job.</p></div>';
+                    return;
+                }
+
+                list.innerHTML = apps.map(app => {
+                    const date       = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}) : 'N/A';
+                    const resumeHtml = app.resume_path
+                        ? `<a class="resume-link" href="${app.resume_path}" target="_blank">📎 View Resume</a>` : '';
+                    const coverHtml  = app.cover_letter
+                        ? `<div class="cover-text">"${app.cover_letter}"</div>` : '';
+                    return `
+                    <div class="app-row b-${app.status}" id="row-${app.id}">
+                        <div class="app-info">
+                            <strong>${app.applicant_name || 'Applicant #' + app.user_id}</strong>
+                            <small>📧 ${app.applicant_email || 'N/A'}  |  Applied: ${date}</small>
+                            ${coverHtml}
+                        </div>
+                        <div class="app-actions">
+                            <span class="status status-${app.status}" id="status-${app.id}">${app.status}</span>
+                            <div class="action-btns">
+                                <button class="btn-review" onclick="updateStatus(${app.id},'reviewed')">👁 Review</button>
+                                <button class="btn-accept" onclick="updateStatus(${app.id},'accepted')">✅ Accept</button>
+                                <button class="btn-reject" onclick="updateStatus(${app.id},'rejected')">❌ Reject</button>
+                            </div>
+                            ${resumeHtml}
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Failed to load applications', e);
+                showToast('Failed to load applications.');
+            }
+        }
+
+        async function updateStatus(appId, newStatus) {
+            try {
+                const res    = await fetch('update_status.php', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ app_id: appId, new_status: newStatus })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    // Update badge and border in place (no full reload)
+                    const badge = document.getElementById('status-' + appId);
+                    const row   = document.getElementById('row-' + appId);
+                    if (badge) {
+                        badge.textContent = newStatus;
+                        badge.className   = 'status status-' + newStatus;
+                    }
+                    if (row) {
+                        row.className = 'app-row b-' + newStatus;
+                    }
+                    showToast('Status updated to ' + newStatus);
+                    loadApplications(); // refresh stats
+                } else {
+                    showToast(result.message || 'Update failed.');
+                }
+            } catch (e) { showToast('Failed to update status.'); }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        loadJobs();
+    </script>
+</body>
+</html>

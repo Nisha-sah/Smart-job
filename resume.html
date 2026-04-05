@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans','Segoe UI',sans-serif; background: #eef0f4; min-height: 100vh; }
+
+        nav {
+            background: #0984e3; padding: 0 32px;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
+        }
+        nav .brand { color: white; font-weight: 700; font-size: 1.1rem; }
+        nav .nav-links { display: flex; gap: 6px; }
+        nav a {
+            color: rgba(255,255,255,0.85); text-decoration: none;
+            padding: 6px 13px; border-radius: 6px; font-size: 0.86rem; font-weight: 500;
+            transition: background 0.2s;
+        }
+        nav a:hover, nav a.active { background: rgba(255,255,255,0.2); color: white; }
+
+        .page { display: flex; justify-content: center; padding: 40px 16px; }
+        .container {
+            background: white; padding: 36px 32px; border-radius: 14px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.09); width: 100%; max-width: 560px;
+        }
+        h2 { color: #0984e3; font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+        .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 28px; }
+
+        /* Current resume card */
+        .current-resume {
+            background: #f0faf7; border: 1.5px solid #00b894; border-radius: 10px;
+            padding: 18px 20px; margin-bottom: 28px; display: none;
+        }
+        .current-resume .cr-label { font-size: 0.76rem; color: #00704f; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .current-resume .cr-name { font-size: 0.97rem; font-weight: 600; color: #222; margin-bottom: 4px; }
+        .current-resume .cr-meta { font-size: 0.82rem; color: #666; margin-bottom: 12px; }
+        .cr-actions { display: flex; gap: 10px; }
+        .btn-view {
+            background: #0984e3; color: white; border: none; padding: 8px 16px;
+            border-radius: 6px; font-family: inherit; font-size: 0.86rem;
+            font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block;
+        }
+        .btn-delete {
+            background: white; color: #d63031; border: 1.5px solid #d63031;
+            padding: 8px 16px; border-radius: 6px; font-family: inherit;
+            font-size: 0.86rem; font-weight: 600; cursor: pointer;
+        }
+        .btn-delete:hover { background: #fff5f5; }
+
+        /* Upload section */
+        .section-title { font-size: 0.95rem; font-weight: 700; color: #333; margin-bottom: 14px; }
+        .upload-area {
+            width: 100%; border: 2px dashed #c5cad4; border-radius: 10px;
+            padding: 30px 16px; text-align: center; cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            background: #fafbfc; position: relative;
+        }
+        .upload-area:hover { border-color: #0984e3; background: #f0f6ff; }
+        .upload-area.has-file { border-color: #00b894; background: #f0faf7; }
+        .upload-area input[type="file"] {
+            position: absolute; inset: 0; opacity: 0;
+            cursor: pointer; width: 100%; height: 100%;
+        }
+        .upload-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .upload-label { font-size: 0.9rem; color: #555; }
+        .upload-label span { color: #0984e3; font-weight: 600; }
+        .upload-hint { font-size: 0.78rem; color: #999; margin-top: 4px; }
+        #file-name-display {
+            margin-top: 10px; font-size: 0.86rem;
+            color: #00b894; font-weight: 500; display: none;
+        }
+
+        .form-group { margin-top: 20px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.92rem; color: #222; }
+        input[type="text"] {
+            width: 100%; padding: 10px 12px; border: 1.5px solid #dde1e7;
+            border-radius: 7px; font-family: inherit; font-size: 0.92rem;
+            color: #333; outline: none; transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: #0984e3; }
+
+        .upload-btn {
+            margin-top: 20px; background: #0984e3; color: white; border: none;
+            padding: 13px 20px; border-radius: 7px; cursor: pointer;
+            width: 100%; font-weight: 700; font-size: 1rem; font-family: inherit;
+            transition: background 0.2s;
+        }
+        .upload-btn:hover { background: #076bbf; }
+        .upload-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+        .msg { margin-top: 14px; padding: 12px 14px; border-radius: 7px; font-size: 0.88rem; display: none; }
+        .msg.success { background: #d4edda; color: #155724; }
+        .msg.error   { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav>
+        <span class="brand">🧠 Smart Job Portal</span>
+        <div class="nav-links">
+            <a href="index.html">🔍 Jobs</a>
+            <a href="my_applications.html">📋 My Applications</a>
+            <a href="resume.html" class="active">📄 My Resume</a>
+            <a href="employer.html">🏢 Employer Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container">
+            <h2>📄 My Resume</h2>
+            <p class="subtitle">Upload or update your resume. Employers can view it with your applications.</p>
+
+            <!-- Current Resume -->
+            <div class="current-resume" id="current-resume">
+                <div class="cr-label">Current Resume on File</div>
+                <div class="cr-name" id="cr-name">—</div>
+                <div class="cr-meta" id="cr-meta">—</div>
+                <div class="cr-actions">
+                    <a class="btn-view" id="cr-view" href="#" target="_blank">👁 View</a>
+                    <button class="btn-delete" onclick="deleteResume()">🗑 Delete</button>
+                </div>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="section-title" id="upload-section-title">Upload Resume</div>
+            <div class="upload-area" id="upload-area">
+                <input type="file" id="resume-file" accept=".pdf,.doc,.docx" />
+                <div class="upload-icon">📤</div>
+                <div class="upload-label"><span>Click to upload</span> or drag & drop</div>
+                <div class="upload-hint">PDF, DOC, DOCX — max 5MB</div>
+            </div>
+            <div id="file-name-display">✅ <span id="file-name-text"></span></div>
+
+            <div class="form-group">
+                <label for="resume-label">Label (optional)</label>
+                <input type="text" id="resume-label" placeholder="e.g. Software Engineer Resume 2025">
+            </div>
+
+            <button class="upload-btn" id="upload-btn" onclick="uploadResume()">Upload Resume</button>
+            <div class="msg" id="msg"></div>
+        </div>
+    </div>
+
+    <script>
+        async function loadCurrentResume() {
+            try {
+                const res  = await fetch('get_resume.php?user_id=1');
+                const data = await res.json();
+                if (data.success && data.resume_path) {
+                    document.getElementById('current-resume').style.display = 'block';
+                    document.getElementById('cr-name').textContent = data.original_name || 'resume';
+                    document.getElementById('cr-meta').textContent =
+                        'Uploaded: ' + (data.uploaded_at ? new Date(data.uploaded_at).toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) : 'N/A')
+                        + (data.label ? '  |  ' + data.label : '');
+                    document.getElementById('cr-view').href = data.resume_path;
+                    document.getElementById('upload-section-title').textContent = 'Replace Resume';
+                }
+            } catch (e) { /* no resume yet */ }
+        }
+
+        document.getElementById('resume-file').addEventListener('change', function () {
+            const file = this.files[0];
+            const display    = document.getElementById('file-name-display');
+            const nameText   = document.getElementById('file-name-text');
+            const uploadArea = document.getElementById('upload-area');
+            if (file) {
+                nameText.textContent = file.name;
+                display.style.display = 'block';
+                uploadArea.classList.add('has-file');
+            } else {
+                display.style.display = 'none';
+                uploadArea.classList.remove('has-file');
+            }
+        });
+
+        async function uploadResume() {
+            const file  = document.getElementById('resume-file').files[0];
+            const label = document.getElementById('resume-label').value.trim();
+            const btn   = document.getElementById('upload-btn');
+            const msg   = document.getElementById('msg');
+
+            if (!file) { showMsg('Please select a file to upload.', 'error'); return; }
+
+            btn.disabled    = true;
+            btn.textContent = 'Uploading...';
+
+            try {
+                const fd = new FormData();
+                fd.append('user_id', 1);
+                fd.append('resume', file);
+                fd.append('label', label);
+
+                const res    = await fetch('upload_resume.php', { method: 'POST', body: fd });
+                const result = await res.json();
+
+                showMsg(result.message, result.success ? 'success' : 'error');
+                if (result.success) loadCurrentResume();
+            } catch (e) {
+                showMsg('Upload failed. Check server.', 'error');
+            } finally {
+                btn.disabled    = false;
+                btn.textContent = 'Upload Resume';
+            }
+        }
+
+        async function deleteResume() {
+            if (!confirm('Delete your resume? This cannot be undone.')) return;
+            try {
+                const res    = await fetch('delete_resume.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: 1 })
+                });
+                const result = await res.json();
+                showMsg(result.message, result.success ? 'success' : 'error');
+                if (result.success) {
+                    document.getElementById('current-resume').style.display = 'none';
+                    document.getElementById('upload-section-title').textContent = 'Upload Resume';
+                }
+            } catch (e) { showMsg('Delete failed.', 'error'); }
+        }
+
+        function showMsg(text, type) {
+            const el = document.getElementById('msg');
+            el.textContent   = text;
+            el.className     = 'msg ' + type;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        }
+
+        loadCurrentResume();
+    </script>
+</body>
+</html>
