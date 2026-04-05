@@ -6,9 +6,11 @@ require_once __DIR__ . '/../../backend/includes/helpers.php';
 
 setCorsHeaders();
 
+// Start session
+startSession();
+
 // ── Logout ─────────────────────────────────────
 if (($_GET['action'] ?? '') === 'logout') {
-    startSession();
     session_destroy();
     jsonSuccess('Logged out successfully.');
 }
@@ -19,10 +21,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ── Get input ─────────────────────────────────
-$data     = getJson();
-$email    = sanitize($data['email'] ?? '');
+$data = getJson();
+$email = sanitize($data['email'] ?? '');
 $password = $data['password'] ?? '';
-$role     = sanitize($data['role'] ?? '');
+$role = sanitize($data['role'] ?? '');
 
 if (!$email || !$password) {
     jsonError('Email and password are required.');
@@ -50,15 +52,15 @@ if (!password_verify($password, $user['password'])) {
 }
 
 // ── Store session ─────────────────────────────
-startSession();
 $_SESSION['user'] = [
-    'id'    => $user['id'],
-    'name'  => $user['name'],
+    'id' => $user['id'],
+    'name' => $user['name'],
     'email' => $user['email'],
-    'role'  => $user['role'],
+    'role' => $user['role'],
 ];
 
 // ── SUCCESS ───────────────────────────────────
 jsonSuccess('Login successful.', [
     'user' => $_SESSION['user']
 ]);
+?>

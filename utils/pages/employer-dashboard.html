@@ -4,336 +4,960 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employer Dashboard — Smart Job Portal</title>
-   <link rel="stylesheet" href="../../Frontend/css/main.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark:      #0d0f14;
+      --bg-card:      #161a22;
+      --bg-surface:   #1e2330;
+      --accent:       #00d4aa;
+      --accent-dim:   #00d4aa22;
+      --accent-hover: #00bfa0;
+      --text-pri:     #f0f2f7;
+      --text-sec:     #8b92a5;
+      --text-muted:   #555e72;
+      --border:       #252c3d;
+      --red:          #ff4f6a;
+      --green:        #00c896;
+      --yellow:       #ffb74d;
+      --radius:       12px;
+      --radius-sm:    8px;
+      --shadow:       0 4px 24px rgba(0,0,0,0.4);
+      --transition:   0.18s cubic-bezier(.4,0,.2,1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg-dark); color: var(--text-pri); min-height: 100vh; line-height: 1.6; }
+    h1,h2,h3,h4,h5 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-pri); }
+    a { color: var(--accent); text-decoration: none; }
+
+    /* ── NAVBAR ── */
+    .navbar { background: rgba(13,15,20,0.97); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .navbar-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; padding: 0 32px; max-width: 1300px; margin: 0 auto; }
+    .logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 800; color: var(--text-pri) !important; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a { color: var(--text-sec); font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: var(--radius-sm); transition: color var(--transition), background var(--transition); }
+    .nav-links a:hover { color: var(--text-pri); background: var(--bg-surface); }
+    .nav-links a.active { color: var(--accent); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .user-chip { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 50px; padding: 5px 14px 5px 8px; }
+    .user-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-dim); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--accent); }
+    .user-name { font-size: 13px; font-weight: 600; color: var(--text-pri); }
+
+    /* ── BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; border-radius: var(--radius-sm); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: var(--transition); white-space: nowrap; }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-pri); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-danger { background: rgba(255,79,106,0.12); border: 1px solid rgba(255,79,106,0.3); color: var(--red); }
+    .btn-danger:hover { background: rgba(255,79,106,0.22); }
+    .btn-success { background: rgba(0,200,150,0.12); border: 1px solid rgba(0,200,150,0.3); color: var(--green); }
+    .btn-success:hover { background: rgba(0,200,150,0.22); }
+    .btn-sm { padding: 6px 14px; font-size: 12px; }
+    .btn-xs { padding: 4px 10px; font-size: 11px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    /* ── LAYOUT ── */
+    .page-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 64px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar { background: var(--bg-card); border-right: 1px solid var(--border); padding: 24px 16px; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
+    .sidebar-section { margin-bottom: 8px; }
+    .sidebar-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 12px; margin-bottom: 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; color: var(--text-sec); cursor: pointer; transition: var(--transition); margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; }
+    .nav-item:hover { background: var(--bg-surface); color: var(--text-pri); }
+    .nav-item.active { background: var(--accent-dim); color: var(--accent); font-weight: 600; }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+    .nav-item .badge-count { margin-left: auto; background: var(--accent); color: #000; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 20px; }
+    .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    /* ── MAIN CONTENT ── */
+    .main-content { padding: 32px; max-width: 1060px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+    .page-header h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+    .page-header p { font-size: 14px; color: var(--text-sec); }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* ── STAT CARDS ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--accent); opacity: 0; transition: opacity var(--transition); }
+    .stat-card:hover::before { opacity: 1; }
+    .stat-icon { font-size: 22px; margin-bottom: 12px; }
+    .stat-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: var(--text-sec); font-weight: 500; }
+    .stat-change { font-size: 11px; color: var(--green); margin-top: 6px; }
+
+    /* ── CARDS ── */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+    .card-header h3 { font-size: 16px; font-weight: 700; }
+    .card-body { padding: 22px; }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .tab { padding: 11px 20px; font-size: 13px; font-weight: 600; color: var(--text-sec); cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap; }
+    .tab:hover { color: var(--text-pri); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── ALERTS ── */
+    .alert { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; }
+    .alert-success { background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.25); color: var(--green); }
+    .alert-error { background: rgba(255,79,106,0.1); border: 1px solid rgba(255,79,106,0.25); color: var(--red); }
+    .alert-info { background: var(--accent-dim); border: 1px solid rgba(0,212,170,0.25); color: var(--accent); }
+    #page-alert:empty { display: none; }
+
+    /* ── JOB TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 14px 14px; font-size: 13px; border-bottom: 1px solid rgba(37,44,61,0.5); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.015); }
+    .job-title-cell .title { font-weight: 700; color: var(--text-pri); font-size: 14px; margin-bottom: 2px; }
+    .job-title-cell .meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-btns { display: flex; gap: 6px; align-items: center; }
+
+    /* ── BADGES ── */
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.3px; white-space: nowrap; }
+    .badge-green  { background: rgba(0,200,150,0.12); color: var(--green); }
+    .badge-red    { background: rgba(255,79,106,0.12); color: var(--red); }
+    .badge-yellow { background: rgba(255,183,77,0.12); color: var(--yellow); }
+    .badge-gray   { background: var(--bg-surface); color: var(--text-sec); }
+    .badge-accent { background: var(--accent-dim); color: var(--accent); cursor: pointer; }
+    .badge-accent:hover { background: rgba(0,212,170,0.2); }
+
+    /* ── APPLICANT CARDS ── */
+    .applicant-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px 20px; margin-bottom: 12px; }
+    .applicant-card:last-child { margin-bottom: 0; }
+    .applicant-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+    .applicant-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-pri); margin-bottom: 2px; }
+    .applicant-email { font-size: 12px; color: var(--text-sec); }
+    .applicant-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .cover-letter-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 12px; max-height: 100px; overflow: hidden; position: relative; }
+    .cover-letter-box.expanded { max-height: none; }
+    .status-action-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .status-btn { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: var(--transition); font-family: 'Plus Jakarta Sans', sans-serif; }
+    .status-btn.pending  { background: rgba(255,183,77,0.12); border-color: rgba(255,183,77,0.3); color: var(--yellow); }
+    .status-btn.accepted { background: rgba(0,200,150,0.12); border-color: rgba(0,200,150,0.3); color: var(--green); }
+    .status-btn.rejected { background: rgba(255,79,106,0.12); border-color: rgba(255,79,106,0.3); color: var(--red); }
+    .status-btn.active-status { opacity: 1; }
+    .status-btn:not(.active-status) { opacity: 0.45; }
+    .status-btn:not(.active-status):hover { opacity: 0.8; }
+
+    /* ── FORMS ── */
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-sec); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .form-control { width: 100%; padding: 11px 14px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-pri); font-size: 14px; font-family: inherit; transition: border-color var(--transition); outline: none; }
+    .form-control:focus { border-color: var(--accent); }
+    .form-control::placeholder { color: var(--text-muted); }
+    select.form-control { cursor: pointer; }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: slideUp 0.2s ease; }
+    .modal-sm { max-width: 420px; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+    .modal-header h3 { font-size: 17px; font-weight: 700; }
+    .modal-close { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text-muted); cursor: pointer; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .modal-close:hover { border-color: var(--red); color: var(--red); }
+    .modal-body { padding: 22px 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── LOADER ── */
+    .loader { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-row td { text-align: center; padding: 40px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 56px 24px; color: var(--text-muted); }
+    .empty-state .icon { font-size: 44px; margin-bottom: 14px; }
+    .empty-state h3 { font-size: 17px; color: var(--text-sec); margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; margin-bottom: 20px; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; box-shadow: var(--shadow); animation: toastIn 0.25s ease; }
+    .toast-success { background: #0d2420; border: 1px solid rgba(0,200,150,0.3); color: var(--green); }
+    .toast-error   { background: #200d10; border: 1px solid rgba(255,79,106,0.3); color: var(--red); }
+    @keyframes toastIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: none; } }
+
+    /* ── JOB SELECT for applicants ── */
+    .job-select-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .job-select-bar select { flex: 1; min-width: 220px; }
+
+    /* ── REVIEW BACK BUTTON ── */
+    .back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-sec); cursor: pointer; margin-bottom: 20px; background: none; border: none; transition: color var(--transition); }
+    .back-btn:hover { color: var(--accent); }
+
+    /* ── UTILITIES ── */
+    .hidden { display: none !important; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .mt-16 { margin-top: 16px; }
+    .text-muted { color: var(--text-muted); font-size: 13px; }
+
+    @media (max-width: 900px) {
+      .page-layout { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; display: flex; flex-wrap: wrap; gap: 4px; padding: 12px; border-right: none; border-bottom: 1px solid var(--border); }
+      .sidebar-label, .sidebar-divider { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
+      .main-content { padding: 20px; }
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .navbar-inner { padding: 0 16px; }
+    }
+  </style>
 </head>
-<body class="page-wrapper">
-  <nav class="navbar">
-    <div class="navbar-inner">
-      <a href="index.html" class="logo">Job<span>Portal</span></a>
-      <div class="nav-links" id="nav-links"></div>
-      <div class="nav-actions" id="nav-actions"></div>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="index.html" class="logo">Job<span>Portal</span></a>
+    <div class="nav-links">
+      <a href="employer-dashboard.html" class="active">Dashboard</a>
+      <a href="job-listings.html">Browse Jobs</a>
     </div>
-  </nav>
-
-  <main>
-    <div class="container">
-      <div class="page-header flex-between">
-        <div>
-          <h1 id="greeting">Employer Dashboard</h1>
-          <p class="text-sec">Manage your job postings and applicants</p>
-        </div>
-        <a href="post-job.html" class="btn btn-primary">+ Post a New Job</a>
+    <div class="nav-actions">
+      <div class="user-chip" id="user-chip">
+        <div class="user-avatar" id="user-avatar">E</div>
+        <span class="user-name" id="user-name-display">Employer</span>
       </div>
-
-      <!-- Stats -->
-      <div class="stats-grid" style="margin-bottom:24px">
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-total">—</div>
-          <div class="stat-label">Total Postings</div>
-        </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-open" style="color:var(--green)">—</div>
-          <div class="stat-label">Active Jobs</div>
-        </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-applicants">—</div>
-          <div class="stat-label">Total Applicants</div>
-        </div>
-        <div class="card stat-card">
-          <div class="stat-value" id="stat-closed" style="color:var(--text-muted)">—</div>
-          <div class="stat-label">Closed Jobs</div>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <div class="tabs">
-        <div class="tab active" onclick="switchTab('jobs', this)">My Job Postings</div>
-        <div class="tab" onclick="switchTab('applicants', this)">Applicants</div>
-      </div>
-
-      <!-- Jobs Tab -->
-      <div id="tab-jobs">
-        <div id="jobs-list"><div class="loader"></div></div>
-      </div>
-
-      <!-- Applicants Tab -->
-      <div id="tab-applicants" class="hidden">
-        <div class="form-group" style="max-width:360px; margin-bottom:16px">
-          <label class="form-label">Select Job to View Applicants</label>
-          <select id="job-select" class="form-control" onchange="loadApplicants()">
-            <option value="">— choose a job —</option>
-          </select>
-        </div>
-        <div id="applicants-list"></div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Edit Job Modal -->
-  <div class="modal-overlay" id="edit-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Edit Job Posting</h3>
-        <button class="modal-close" onclick="closeEditModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div id="edit-alert"></div>
-        <input type="hidden" id="edit-job-id">
-        <div class="form-group">
-          <label class="form-label">Job Title *</label>
-          <input type="text" id="edit-title" class="form-control">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Description *</label>
-          <textarea id="edit-description" class="form-control" rows="5"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Category</label>
-            <select id="edit-category" class="form-control">
-              <option value="">Select…</option>
-              <option>Technology</option><option>Marketing</option><option>Finance</option>
-              <option>Design</option><option>Engineering</option><option>Healthcare</option>
-              <option>Education</option><option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Job Type</label>
-            <select id="edit-job_type" class="form-control">
-              <option value="full-time">Full Time</option>
-              <option value="part-time">Part Time</option>
-              <option value="contract">Contract</option>
-              <option value="internship">Internship</option>
-              <option value="remote">Remote</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Location</label>
-          <input type="text" id="edit-location" class="form-control">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Min Salary ($)</label>
-            <input type="number" id="edit-salary_min" class="form-control">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Max Salary ($)</label>
-            <input type="number" id="edit-salary_max" class="form-control">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Skills (comma-separated)</label>
-          <input type="text" id="edit-skills" class="form-control" placeholder="e.g. React, Node.js, AWS">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Status</label>
-          <select id="edit-status" class="form-control">
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
-        <button class="btn btn-primary" id="save-edit-btn" onclick="saveEdit()">Save Changes</button>
-      </div>
+      <button class="btn btn-outline btn-sm" onclick="handleLogout()">Logout</button>
     </div>
   </div>
+</nav>
 
-  <script src="../../Frontend/js/app.js"></script>
-  <script>
-    let allJobs = [];
+<div class="page-layout">
 
-    async function init() {
-      const user = await Auth.requireRole('employer', 'login.html');
-      if (!user) return;
-      document.getElementById('greeting').textContent = `Welcome, ${user.name.split(' ')[0]} 👋`;
-      await loadJobs();
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Overview</div>
+      <button class="nav-item active" data-tab="overview" onclick="switchTab('overview')">
+        <span class="icon">📊</span> Dashboard
+      </button>
+      <button class="nav-item" data-tab="myjobs" onclick="switchTab('myjobs')">
+        <span class="icon">📋</span> My Job Posts
+        <span class="badge-count" id="jobs-count-badge">0</span>
+      </button>
+    </div>
+    <hr class="sidebar-divider">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Hiring</div>
+      <button class="nav-item" data-tab="applicants" onclick="switchTab('applicants')">
+        <span class="icon">👥</span> Review Applications
+      </button>
+    </div>
+    <hr class="sidebar-divider">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Actions</div>
+      <button class="nav-item" onclick="window.location.href='post-job.html'">
+        <span class="icon">➕</span> Post New Job
+      </button>
+      <button class="nav-item" onclick="window.location.href='job-listings.html'">
+        <span class="icon">🔍</span> All Listings
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <div class="main-content">
+
+    <div id="page-alert"></div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB: OVERVIEW DASHBOARD (6.2)
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="page-header">
+        <div>
+          <h1>Employer Dashboard</h1>
+          <p>Welcome back! Here's your hiring overview.</p>
+        </div>
+        <div class="header-actions">
+          <a href="post-job.html" class="btn btn-primary">➕ Post New Job</a>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-value" id="stat-total-jobs">—</div>
+          <div class="stat-label">Total Job Posts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-value" id="stat-open-jobs">—</div>
+          <div class="stat-label">Open Positions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="stat-total-apps">—</div>
+          <div class="stat-label">Total Applicants</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-label">Pending Review</div>
+        </div>
+      </div>
+
+      <!-- Recent Jobs Preview -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent Job Postings</h3>
+          <button class="btn btn-outline btn-sm" onclick="switchTab('myjobs')">View All →</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Job</th>
+                <th>Status</th>
+                <th>Applicants</th>
+                <th>Posted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="overview-jobs-tbody">
+              <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB: MY POSTED JOBS (2.4)
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-myjobs" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1>View Posted Jobs</h1>
+          <p>Manage all your job listings.</p>
+        </div>
+        <div class="header-actions">
+          <a href="post-job.html" class="btn btn-primary">➕ Post New Job</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header flex-between">
+          <h3>All Posted Jobs</h3>
+          <span class="text-muted" id="myjobs-count-label">Loading…</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Job Details</th>
+                <th>Type</th>
+                <th>Salary</th>
+                <th>Status</th>
+                <th>Applicants</th>
+                <th>Posted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="myjobs-tbody">
+              <tr class="loading-row"><td colspan="7"><div class="loader"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         TAB: REVIEW APPLICATIONS (4.2 & 4.3)
+    ══════════════════════════════════════════════════════ -->
+    <div id="tab-applicants" class="tab-content">
+      <div class="page-header">
+        <div>
+          <h1>Review Applications</h1>
+          <p>View and update applicant status for your jobs.</p>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-body" style="padding-bottom: 16px;">
+          <div class="job-select-bar">
+            <label class="form-label" style="margin:0; white-space:nowrap;">Select Job to Review:</label>
+            <select id="job-select" class="form-control" onchange="loadApplicants()">
+              <option value="">— Choose a job —</option>
+            </select>
+            <span class="badge badge-gray" id="apps-count-badge" style="white-space:nowrap; display:none;"></span>
+          </div>
+        </div>
+      </div>
+
+      <div id="applicants-container">
+        <div class="empty-state">
+          <div class="icon">👆</div>
+          <h3>Select a job above</h3>
+          <p>Choose one of your job postings to view applicants</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /page-layout -->
+
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: EDIT JOB (2.2)
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ Edit Job Post</h3>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="edit-alert"></div>
+      <input type="hidden" id="edit-job-id">
+
+      <div class="form-group">
+        <label class="form-label">Job Title *</label>
+        <input type="text" id="edit-title" class="form-control" placeholder="e.g. Senior Frontend Developer">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea id="edit-description" class="form-control" rows="5" placeholder="Describe the role…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="edit-category" class="form-control">
+            <option value="">Select…</option>
+            <option>Technology</option><option>Marketing</option><option>Finance</option>
+            <option>Design</option><option>Engineering</option><option>Healthcare</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Job Type</label>
+          <select id="edit-job_type" class="form-control">
+            <option value="full-time">Full Time</option>
+            <option value="part-time">Part Time</option>
+            <option value="contract">Contract</option>
+            <option value="internship">Internship</option>
+            <option value="remote">Remote</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input type="text" id="edit-location" class="form-control" placeholder="e.g. New York, NY or Remote">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Min Salary ($/yr)</label>
+          <input type="number" id="edit-salary_min" class="form-control" placeholder="60000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Salary ($/yr)</label>
+          <input type="number" id="edit-salary_max" class="form-control" placeholder="90000">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Required Skills</label>
+        <input type="text" id="edit-skills" class="form-control" placeholder="React, Node.js, Python">
+        <div class="form-hint">Comma-separated</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Listing Status</label>
+        <select id="edit-status" class="form-control">
+          <option value="open">✅ Open — Accepting Applications</option>
+          <option value="closed">🔒 Closed — No Longer Accepting</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" id="save-edit-btn" onclick="saveEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: DELETE CONFIRM (2.3)
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h3>🗑️ Delete Job Post</h3>
+      <button class="modal-close" onclick="closeDeleteModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: var(--text-sec); font-size: 14px; line-height: 1.6;">
+        Are you sure you want to permanently delete <strong id="delete-job-title" style="color: var(--text-pri);"></strong>?
+      </p>
+      <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">
+        ⚠️ This will also remove all applications for this job. This action cannot be undone.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">🗑️ Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     SCRIPT
+══════════════════════════════════════════════════════ -->
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:8080/job-portal-system/helper/api';
+
+// ── HTTP HELPERS ─────────────────────────────────────────────────────────────
+const api = {
+  get(url) {
+    return fetch(`${API_BASE}/${url}`, { credentials: 'include' }).then(r => r.json());
+  },
+  post(url, data) {
+    return fetch(`${API_BASE}/${url}`, {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(r => r.json());
+  },
+  put(url, data) {
+    return fetch(`${API_BASE}/${url}`, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }).then(r => r.json());
+  },
+  delete(url) {
+    return fetch(`${API_BASE}/${url}`, { method: 'DELETE', credentials: 'include' }).then(r => r.json());
+  }
+};
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+const Auth = {
+  getUser() { try { return JSON.parse(sessionStorage.getItem('user') || 'null'); } catch { return null; } },
+  setUser(u) { sessionStorage.setItem('user', JSON.stringify(u)); },
+  logout()   { sessionStorage.removeItem('user'); }
+};
+
+// ── Guard: employer only ─────────────────────────────────────────────────────
+(function guard() {
+  const user = Auth.getUser();
+  if (!user) { window.location.href = 'login.html'; return; }
+  if (user.role !== 'employer') { window.location.href = 'login.html'; return; }
+
+  // Populate navbar user info
+  const initials = user.name ? user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) : 'E';
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name-display').textContent = user.name || 'Employer';
+})();
+
+async function handleLogout() {
+  try { await api.get('auth.php?action=logout'); } catch(_) {}
+  Auth.logout();
+  window.location.href = 'login.html';
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatSalary(min, max) {
+  if (!min || min <= 0) return '<span style="color:var(--text-muted)">Competitive</span>';
+  const fmt = n => '$' + Number(n).toLocaleString();
+  return max && max > 0 ? `${fmt(min)} – ${fmt(max)}` : `${fmt(min)}+`;
+}
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  const diff = Math.floor((new Date() - d) / 86400000);
+  if (diff === 0) return '<span style="color:var(--accent)">Today</span>';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7)  return diff + 'd ago';
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function statusBadge(status) {
+  const map = { open:'badge-green', closed:'badge-gray', pending:'badge-yellow', accepted:'badge-green', rejected:'badge-red' };
+  const cls = map[status] || 'badge-gray';
+  const label = status ? status.charAt(0).toUpperCase() + status.slice(1) : '—';
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function typePill(type) {
+  const map = { 'full-time':'badge-green','part-time':'badge-yellow','contract':'badge-accent','remote':'badge-accent','internship':'badge-gray' };
+  return `<span class="badge ${map[type]||'badge-gray'}">${escapeHtml(type||'—')}</span>`;
+}
+function showAlert(msg, type = 'info') {
+  document.getElementById('page-alert').innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+  setTimeout(() => { document.getElementById('page-alert').innerHTML = ''; }, 4000);
+}
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let myJobs = [];
+let pendingDeleteId = null;
+
+// ── TAB SWITCHING ─────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
+  if (tab === 'applicants') populateJobSelect();
+}
+
+// ══════════════════════════════════════════════════════════════
+// 6.2 — LOAD DASHBOARD DATA
+// ══════════════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const data = await api.get('jobs.php?action=my');
+    if (data.error) throw new Error(data.error);
+    myJobs = data.jobs || [];
+
+    // ── Stats ──
+    const totalJobs  = myJobs.length;
+    const openJobs   = myJobs.filter(j => j.status === 'open').length;
+    const totalApps  = myJobs.reduce((s, j) => s + parseInt(j.applicant_count || 0), 0);
+    // We'll count pending from applicants — use a simple estimate from job count
+    const pendingEst = myJobs.filter(j => j.status === 'open').reduce((s, j) => s + parseInt(j.applicant_count || 0), 0);
+
+    document.getElementById('stat-total-jobs').textContent = totalJobs;
+    document.getElementById('stat-open-jobs').textContent  = openJobs;
+    document.getElementById('stat-total-apps').textContent = totalApps;
+    document.getElementById('stat-pending').textContent    = pendingEst;
+    document.getElementById('jobs-count-badge').textContent = totalJobs;
+
+    // ── Overview table (recent 5) ──
+    renderJobsTable('overview-jobs-tbody', myJobs.slice(0, 5), true);
+
+    // ── My Jobs table (all) ──
+    renderJobsTable('myjobs-tbody', myJobs, false);
+    document.getElementById('myjobs-count-label').textContent =
+      `${totalJobs} job${totalJobs !== 1 ? 's' : ''}`;
+
+    // ── Job select for applicants ──
+    populateJobSelect();
+
+  } catch (err) {
+    showAlert('Failed to load dashboard: ' + err.message, 'error');
+    document.getElementById('overview-jobs-tbody').innerHTML =
+      `<tr><td colspan="5" style="text-align:center; color:var(--red); padding:24px">⚠️ ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 2.4 — RENDER JOBS TABLE
+// ══════════════════════════════════════════════════════════════
+function renderJobsTable(tbodyId, jobs, compact) {
+  const tbody = document.getElementById(tbodyId);
+  if (!jobs.length) {
+    const cols = compact ? 5 : 7;
+    tbody.innerHTML = `
+      <tr><td colspan="${cols}">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <h3>No jobs posted yet</h3>
+          <p>Create your first listing to start receiving applications</p>
+          <a href="post-job.html" class="btn btn-primary btn-sm">➕ Post a Job</a>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = jobs.map(job => `
+    <tr>
+      <td>
+        <div class="job-title-cell">
+          <div class="title">${escapeHtml(job.title)}</div>
+          <div class="meta">
+            <span>📍 ${escapeHtml(job.location || 'Remote')}</span>
+            ${job.category ? `<span>🏷️ ${escapeHtml(job.category)}</span>` : ''}
+          </div>
+        </div>
+      </td>
+      ${!compact ? `<td>${typePill(job.job_type)}</td>` : ''}
+      ${!compact ? `<td>${formatSalary(job.salary_min, job.salary_max)}</td>` : ''}
+      <td>${statusBadge(job.status)}</td>
+      <td>
+        <span class="badge badge-accent" onclick="viewApplicantsForJob(${job.id})" title="Review applicants">
+          ${parseInt(job.applicant_count || 0)} applicants
+        </span>
+      </td>
+      <td style="color:var(--text-muted); font-size:12px">${formatDate(job.created_at)}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn btn-outline btn-xs" onclick="openEditModal(${job.id})" title="Edit job">✏️ Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="openDeleteModal(${job.id}, '${escapeHtml(job.title)}')" title="Delete job">🗑️</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// 2.2 — EDIT JOB POST
+// ══════════════════════════════════════════════════════════════
+function openEditModal(jobId) {
+  const job = myJobs.find(j => j.id == jobId);
+  if (!job) return;
+
+  document.getElementById('edit-job-id').value       = job.id;
+  document.getElementById('edit-title').value        = job.title || '';
+  document.getElementById('edit-description').value  = job.description || '';
+  document.getElementById('edit-category').value     = job.category || '';
+  document.getElementById('edit-job_type').value     = job.job_type || 'full-time';
+  document.getElementById('edit-location').value     = job.location || '';
+  document.getElementById('edit-salary_min').value   = job.salary_min || '';
+  document.getElementById('edit-salary_max').value   = job.salary_max || '';
+  document.getElementById('edit-skills').value       = job.skills || '';
+  document.getElementById('edit-status').value       = job.status || 'open';
+  document.getElementById('edit-alert').innerHTML    = '';
+
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function saveEdit() {
+  const jobId = document.getElementById('edit-job-id').value;
+  const title = document.getElementById('edit-title').value.trim();
+  const desc  = document.getElementById('edit-description').value.trim();
+
+  if (!title || !desc) {
+    document.getElementById('edit-alert').innerHTML =
+      '<div class="alert alert-error">⚠️ Title and description are required.</div>';
+    return;
+  }
+
+  const btn = document.getElementById('save-edit-btn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    title,
+    description: desc,
+    category:    document.getElementById('edit-category').value,
+    job_type:    document.getElementById('edit-job_type').value,
+    location:    document.getElementById('edit-location').value,
+    salary_min:  parseFloat(document.getElementById('edit-salary_min').value) || 0,
+    salary_max:  parseFloat(document.getElementById('edit-salary_max').value) || 0,
+    skills:      document.getElementById('edit-skills').value,
+    status:      document.getElementById('edit-status').value
+  };
+
+  try {
+    const data = await api.put(`jobs.php?action=update&id=${jobId}`, payload);
+    if (data.error) throw new Error(data.error);
+
+    document.getElementById('edit-alert').innerHTML =
+      '<div class="alert alert-success">✅ Job updated successfully!</div>';
+    btn.textContent = '✅ Saved!';
+
+    setTimeout(async () => {
+      closeEditModal();
+      btn.disabled = false; btn.textContent = '💾 Save Changes';
+      await loadDashboard(); // Immediately reflects updated data (Req 2.2)
+      showToast('Job post updated successfully!');
+    }, 900);
+
+  } catch (err) {
+    document.getElementById('edit-alert').innerHTML =
+      `<div class="alert alert-error">❌ ${escapeHtml(err.message)}</div>`;
+    btn.disabled = false; btn.textContent = '💾 Save Changes';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 2.3 — DELETE JOB POST
+// ══════════════════════════════════════════════════════════════
+function openDeleteModal(jobId, jobTitle) {
+  pendingDeleteId = jobId;
+  document.getElementById('delete-job-title').textContent = jobTitle;
+  document.getElementById('delete-modal').classList.add('open');
+}
+
+function closeDeleteModal() {
+  document.getElementById('delete-modal').classList.remove('open');
+  pendingDeleteId = null;
+}
+
+async function confirmDelete() {
+  if (!pendingDeleteId) return;
+
+  const btn = document.getElementById('confirm-delete-btn');
+  btn.disabled = true; btn.textContent = 'Deleting…';
+
+  try {
+    const data = await api.delete(`jobs.php?action=delete&id=${pendingDeleteId}`);
+    if (data.error) throw new Error(data.error);
+
+    closeDeleteModal();
+    await loadDashboard(); // Job removed from listings (Req 2.3)
+    showToast('Job post deleted permanently.');
+
+  } catch (err) {
+    showToast('Delete failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '🗑️ Delete Permanently';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// 4.2 — REVIEW APPLICATIONS
+// ══════════════════════════════════════════════════════════════
+function populateJobSelect() {
+  const sel = document.getElementById('job-select');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— Choose a job —</option>' +
+    myJobs.map(j =>
+      `<option value="${j.id}">${escapeHtml(j.title)} (${j.applicant_count || 0} applicants)</option>`
+    ).join('');
+  if (prev) sel.value = prev;
+}
+
+function viewApplicantsForJob(jobId) {
+  switchTab('applicants');
+  document.getElementById('job-select').value = jobId;
+  loadApplicants();
+}
+
+async function loadApplicants() {
+  const jobId = document.getElementById('job-select').value;
+  const container = document.getElementById('applicants-container');
+  const badge = document.getElementById('apps-count-badge');
+
+  if (!jobId) {
+    badge.style.display = 'none';
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">👆</div>
+        <h3>Select a job above</h3>
+        <p>Choose one of your job postings to view applicants</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = '<div class="loader"></div>';
+  badge.style.display = 'none';
+
+  try {
+    const data = await api.get(`applications.php?action=job&job_id=${jobId}`);
+    if (data.error) throw new Error(data.error);
+
+    const apps = data.applications || [];
+    badge.textContent = `${apps.length} applicant${apps.length !== 1 ? 's' : ''}`;
+    badge.style.display = 'inline-flex';
+
+    if (!apps.length) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">📭</div>
+          <h3>No applications yet</h3>
+          <p>Share your job listing to attract candidates</p>
+        </div>`;
+      return;
     }
 
-    async function loadJobs() {
-      const list = document.getElementById('jobs-list');
-      try {
-        const data = await api.get('jobs.php?action=my');
-        allJobs = data.jobs;
+    container.innerHTML = apps.map(app => `
+      <div class="applicant-card" id="app-card-${app.id}">
+        <div class="applicant-top">
+          <div>
+            <div class="applicant-name">${escapeHtml(app.name)}</div>
+            <div class="applicant-email">✉️ ${escapeHtml(app.email)}</div>
+          </div>
+          <div>${statusBadge(app.status || 'pending')}</div>
+        </div>
 
-        const total     = allJobs.length;
-        const open      = allJobs.filter(j => j.status === 'open').length;
-        const closed    = allJobs.filter(j => j.status === 'closed').length;
-        const applicants = allJobs.reduce((sum, j) => sum + Number(j.applicant_count), 0);
+        <div class="applicant-meta">
+          <span>📅 Applied: ${formatDate(app.applied_at)}</span>
+          ${app.phone    ? `<span>📞 ${escapeHtml(app.phone)}</span>`    : ''}
+          ${app.location ? `<span>📍 ${escapeHtml(app.location)}</span>` : ''}
+        </div>
 
-        document.getElementById('stat-total').textContent     = total;
-        document.getElementById('stat-open').textContent      = open;
-        document.getElementById('stat-closed').textContent    = closed;
-        document.getElementById('stat-applicants').textContent = applicants;
+        ${app.cover_letter ? `
+          <div class="cover-letter-box" id="cl-${app.id}">
+            <strong style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">Cover Letter</strong><br>
+            ${escapeHtml(app.cover_letter)}
+          </div>
+          <button class="btn btn-outline btn-xs" style="margin-bottom:10px" onclick="toggleCover(${app.id})">
+            Read More / Less
+          </button>` : ''}
 
-        // Populate job select
-        const sel = document.getElementById('job-select');
-        sel.innerHTML = '<option value="">— choose a job —</option>' +
-          allJobs.map(j => `<option value="${j.id}">${j.title} (${j.applicant_count} applicants)</option>`).join('');
+        ${app.resume_path ? `
+          <a href="../${escapeHtml(app.resume_path)}" target="_blank" class="btn btn-outline btn-xs" style="margin-bottom: 12px;">
+            📄 View Resume
+          </a>` : ''}
 
-        if (!allJobs.length) {
-          list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>No jobs posted yet</h3><p>Create your first job listing to start receiving applications</p><a href="post-job.html" class="btn btn-primary mt-16">Post a Job</a></div>`;
-          return;
-        }
+        <!-- 4.3: Status update buttons -->
+        <div class="status-action-row">
+          <span style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; margin-right:4px">Update Status:</span>
+          <button class="status-btn pending ${(app.status||'pending')==='pending'?'active-status':''}"
+            onclick="updateStatus(${app.id}, 'pending', this)">⏳ Pending</button>
+          <button class="status-btn accepted ${app.status==='accepted'?'active-status':''}"
+            onclick="updateStatus(${app.id}, 'accepted', this)">✅ Accepted</button>
+          <button class="status-btn rejected ${app.status==='rejected'?'active-status':''}"
+            onclick="updateStatus(${app.id}, 'rejected', this)">❌ Rejected</button>
+        </div>
+      </div>
+    `).join('');
 
-        list.innerHTML = `
-          <div class="table-wrap card" style="padding:0">
-            <table>
-              <thead>
-                <tr><th>Job Title</th><th>Type</th><th>Location</th><th>Salary</th><th>Applicants</th><th>Status</th><th>Posted</th><th>Actions</th></tr>
-              </thead>
-              <tbody>
-                ${allJobs.map(j => `
-                  <tr>
-                    <td><strong>${j.title}</strong>${j.category ? `<div class="text-muted" style="font-size:12px">${j.category}</div>` : ''}</td>
-                    <td><span class="badge badge-gray">${j.job_type}</span></td>
-                    <td>${j.location || '—'}</td>
-                    <td>${formatSalary(j.salary_min, j.salary_max)}</td>
-                    <td><span class="badge badge-accent">${j.applicant_count}</span></td>
-                    <td>${statusBadge(j.status)}</td>
-                    <td class="text-muted">${formatDate(j.created_at)}</td>
-                    <td>
-                      <div style="display:flex;gap:6px">
-                        <button class="btn btn-sm btn-outline" onclick="openEdit(${j.id})">Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteJob(${j.id}, this)">Delete</button>
-                      </div>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>`;
-      } catch (err) {
-        list.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
-    }
+  } catch (err) {
+    container.innerHTML = `<div class="alert alert-error">❌ ${escapeHtml(err.message)}</div>`;
+  }
+}
 
-    async function loadApplicants() {
-      const jobId = document.getElementById('job-select').value;
-      const list  = document.getElementById('applicants-list');
-      if (!jobId) { list.innerHTML = ''; return; }
+function toggleCover(appId) {
+  document.getElementById(`cl-${appId}`)?.classList.toggle('expanded');
+}
 
-      list.innerHTML = '<div class="loader"></div>';
-      try {
-        const data = await api.get(`applications.php?action=job&job_id=${jobId}`);
-        const apps = data.applications;
+// ══════════════════════════════════════════════════════════════
+// 4.3 — UPDATE APPLICATION STATUS
+// ══════════════════════════════════════════════════════════════
+async function updateStatus(appId, newStatus, clickedBtn) {
+  // Optimistic UI update
+  const card = document.getElementById(`app-card-${appId}`);
+  card.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-status'));
+  clickedBtn.classList.add('active-status');
+  card.querySelector('.badge').className = `badge ${{ pending:'badge-yellow', accepted:'badge-green', rejected:'badge-red' }[newStatus]}`;
+  card.querySelector('.badge').textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
 
-        if (!apps.length) {
-          list.innerHTML = `<div class="empty-state"><div class="icon">👥</div><h3>No applicants yet</h3><p>Share this job to attract candidates</p></div>`;
-          return;
-        }
+  try {
+    const data = await api.put(`applications.php?action=status&id=${appId}`, { status: newStatus });
+    if (data.error) throw new Error(data.error);
+    showToast(`Status updated to "${newStatus}"`);
+    // Refresh counts
+    await loadDashboard();
+  } catch (err) {
+    showToast('Failed to update status: ' + err.message, 'error');
+    // Revert by reloading
+    loadApplicants();
+  }
+}
 
-        list.innerHTML = `
-          <div class="jobs-grid">
-            ${apps.map(a => `
-              <div class="card">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-                  <div>
-                    <div style="font-weight:700;font-size:16px">${a.name}</div>
-                    <div class="text-sec" style="font-size:13px">${a.email}${a.phone ? ' · ' + a.phone : ''}</div>
-                    ${a.location ? `<div class="text-muted" style="font-size:13px">📍 ${a.location}</div>` : ''}
-                    <div style="margin-top:8px;font-size:13px;color:var(--text-muted)">Applied ${formatDate(a.applied_at)}</div>
-                  </div>
-                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-                    ${statusBadge(a.status)}
-                    ${a.resume_path ? `<a href="../${a.resume_path}" target="_blank" class="btn btn-outline btn-sm">📄 Resume</a>` : '<span class="text-muted" style="font-size:12px">No resume</span>'}
-                  </div>
-                </div>
-                ${a.cover_letter ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-sec)">${a.cover_letter}</div>` : ''}
-                <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
-                  <button class="btn btn-sm" style="background:rgba(0,200,150,0.15);color:var(--green);border:1px solid rgba(0,200,150,0.3)"
-                    onclick="updateStatus(${a.id}, 'accepted', this)">✓ Accept</button>
-                  <button class="btn btn-sm btn-danger"
-                    onclick="updateStatus(${a.id}, 'rejected', this)">✕ Reject</button>
-                  <button class="btn btn-sm btn-outline"
-                    onclick="updateStatus(${a.id}, 'pending', this)">⟳ Mark Pending</button>
-                </div>
-              </div>
-            `).join('')}
-          </div>`;
-      } catch (err) {
-        list.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
-      }
-    }
+// ── INIT ─────────────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
 
-    async function updateStatus(appId, status, btn) {
-      setLoading(btn, true, '…');
-      try {
-        await api.put(`applications.php?action=status&id=${appId}`, { status });
-        loadApplicants();
-      } catch (err) {
-        alert(err.message);
-        setLoading(btn, false);
-      }
-    }
-
-    function openEdit(jobId) {
-      const job = allJobs.find(j => j.id == jobId);
-      if (!job) return;
-      document.getElementById('edit-job-id').value        = job.id;
-      document.getElementById('edit-title').value         = job.title;
-      document.getElementById('edit-description').value   = job.description;
-      document.getElementById('edit-category').value      = job.category || '';
-      document.getElementById('edit-job_type').value      = job.job_type;
-      document.getElementById('edit-location').value      = job.location || '';
-      document.getElementById('edit-salary_min').value    = job.salary_min || '';
-      document.getElementById('edit-salary_max').value    = job.salary_max || '';
-      document.getElementById('edit-skills').value        = job.skills || '';
-      document.getElementById('edit-status').value        = job.status;
-      document.getElementById('edit-modal').classList.add('open');
-    }
-
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.remove('open');
-    }
-
-    async function saveEdit() {
-      const jobId = document.getElementById('edit-job-id').value;
-      const btn   = document.getElementById('save-edit-btn');
-      setLoading(btn, true, 'Saving…');
-      try {
-        await api.put(`jobs.php?action=update&id=${jobId}`, {
-          title:       document.getElementById('edit-title').value,
-          description: document.getElementById('edit-description').value,
-          category:    document.getElementById('edit-category').value,
-          job_type:    document.getElementById('edit-job_type').value,
-          location:    document.getElementById('edit-location').value,
-          salary_min:  document.getElementById('edit-salary_min').value,
-          salary_max:  document.getElementById('edit-salary_max').value,
-          skills:      document.getElementById('edit-skills').value,
-          status:      document.getElementById('edit-status').value,
-        });
-        closeEditModal();
-        await loadJobs();
-      } catch (err) {
-        showAlert('#edit-alert', err.message, 'error');
-        setLoading(btn, false);
-      }
-    }
-
-    async function deleteJob(jobId, btn) {
-      if (!confirm('Delete this job posting? This cannot be undone.')) return;
-      setLoading(btn, true, '…');
-      try {
-        await api.delete(`jobs.php?action=delete&id=${jobId}`);
-        await loadJobs();
-      } catch (err) {
-        alert(err.message);
-        setLoading(btn, false);
-      }
-    }
-
-    function switchTab(tab, el) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      el.classList.add('active');
-      ['jobs','applicants'].forEach(t =>
-        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab)
-      );
-    }
-
-    init();
-  </script>
 </body>
 </html>

@@ -5,7 +5,6 @@
 //         formatDate, saveJob
 // ============================================================
 
-
 const API_BASE = 'http://localhost:8080/job-portal-system/helper/api';
 
 // ── HTTP helpers ──────────────────────────────────────────────────────────────

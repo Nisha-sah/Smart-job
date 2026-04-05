@@ -45,7 +45,7 @@ function jsonSuccess($message, $data = []) {
 
 // ── CORS (dev helper) ─────────────────────────────────────────
 function setCorsHeaders() {
-    header('Access-Control-Allow-Origin: http://localhost');
+    header('Access-Control-Allow-Origin: http://localhost:8080');
     header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type');
@@ -60,29 +60,4 @@ function sanitize($value) {
 function getJson() {
     return json_decode(file_get_contents('php://input'), true) ?? [];
 }
-
-// ── Notification Creator ──────────────────────────────────────
-function createNotification($userId, $type, $message, $referenceId = null) {
-    $db  = jobapplicatio();
-    $stmt = $db->prepare(
-        "INSERT INTO notifications (user_id, type, message, reference_id) VALUES (?,?,?,?)"
-    );
-    $stmt->bind_param('issi', $userId, $type, $message, $referenceId);
-    $stmt->execute();
-}
-
-function jobapplicatio() {
-    static $conn;
-
-    if ($conn === null) {
-        require_once __DIR__ . '/../config/database.php';
-
-        $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-        if ($conn->connect_error) {
-            die("Database connection failed: " . $conn->connect_error);
-        }
-    }
-
-    return $conn;
-}
+?>
