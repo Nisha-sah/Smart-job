@@ -1,23 +1,30 @@
-<?php  
+<script>
+async function loadJobs() {
+  const list = document.getElementById('jobs-list');
+  list.innerHTML = '<div class="loader"></div>';
 
-// ── Employer:view Jobs ─────────────────────────────────────────
-function handleMyJobs() {
-    $user = requireAuth('employer');
-    $db   = getDB();
+  try {
+    const data = await api.get('jobs.php?action=my');  // Fetch employer's jobs
+    allJobs = data.jobs || [];
 
-    $stmt = $db->prepare(
-        "SELECT j.*, COUNT(a.id) AS applicant_count
-         FROM jobs j
-         LEFT JOIN applications a ON a.job_id = j.id
-         WHERE j.employer_id = ?
-         GROUP BY j.id
-         ORDER BY j.created_at DESC"
-    );
-    $stmt->bind_param('i', $user['id']);
-    $stmt->execute();
-    $jobs = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    // Update stat cards
+    document.getElementById('stat-total').textContent      = allJobs.length;
+    document.getElementById('stat-open').textContent       = allJobs.filter(j => j.status === 'open').length;
+    document.getElementById('stat-closed').textContent     = allJobs.filter(j => j.status === 'closed').length;
+    document.getElementById('stat-applicants').textContent = allJobs.reduce((sum, j) => sum + Number(j.applicant_count || 0), 0);
 
-    jsonResponse(['jobs' => $jobs]);
+    // Render jobs table
+    list.innerHTML = `
+      <div class="table-wrap card" style="padding:0; overflow:hidden">
+        <table>
+          <thead> ... </thead>
+          <tbody>
+            ${allJobs.map(j => ` ...`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } catch (err) {
+    list.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+  }
 }
-
-?>
+</script>

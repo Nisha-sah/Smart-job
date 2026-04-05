@@ -1,88 +1,120 @@
 <?php
+header('Content-Type: application/json');
 
-// ── Employer: Update Application Status (User Story 4.3) ─────────────────────
-function handleUpdateStatus(): void
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'PUT') jsonError('PUT required.', 405);
+require_once __DIR__ . '/../../backend/config/database.php';
+require_once __DIR__ . '/../../backend/includes/helpers.php';
 
-    $user  = requireAuth('employer');
-    $appId = (int)($_GET['id'] ?? 0);
-    if (!$appId) jsonError('Application ID required.');
+setCorsHeaders();
 
-    $data   = getJson();
-    $status = sanitize($data['status'] ?? '');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') exit;
 
-    // Validate allowed statuses (acceptance criteria 4.3)
-    $allowed = ['pending', 'accepted', 'rejected'];
-    if (!in_array($status, $allowed, true)) {
-        jsonError('Status must be: pending, accepted, or rejected.');
+$action = $_GET['action'] ?? '';
+
+match($action) {
+    'status' => handleUpdateStatus(),
+    default => jsonError('Invalid action.', 404),
+};
+
+function handleUpdateStatus(): void {
+    $user = requireAuth('employer');  // Ensure employer is logged in
+
+    $applicationId = (int)($_GET['id'] ?? 0);
+    if (!$applicationId) jsonError('Application ID required.');
+
+    $input = json_decode(file_get_contents('php://input'), true);
+    $status = $input['status'] ?? '';
+    $allowedStatuses = ['pending', 'accepted', 'rejected'];
+
+    if (!in_array($status, $allowedStatuses)) {
+        jsonError('Invalid status value.');
     }
 
     $db = getDB();
 
-    // Verify employer owns the job linked to this application
-    $check = $db->prepare(
-        "SELECT a.id, a.seeker_id, j.title
-         FROM applications a
-         JOIN jobs j ON j.id = a.job_id
-         WHERE a.id = ? AND j.employer_id = ?"
-    );
-    $check->execute([$appId, $user['id']]);
-    $app = $check->fetch();
-    if (!$app) jsonError('Application not found or access denied.', 403);
+    // Verify application belongs to a job of this employer
+    $check = $db->prepare("
+        SELECT a.id 
+        FROM applications a
+        JOIN jobs j ON j.id = a.job_id
+        WHERE a.id = ? AND j.employer_id = ?
+    ");
+    $check->execute([$applicationId, $user['id']]);
+    if (!$check->fetch()) jsonError('Access denied.', 403);
 
     // Update status
-    $stmt = $db->prepare("UPDATE applications SET status = ?, updated_at = NOW() WHERE id = ?");
-    $stmt->execute([$status, $appId]);
+    $stmt = $db->prepare("UPDATE applications SET status=? WHERE id=?");
+    $stmt->execute([$status, $applicationId]);
 
-    // Notify the applicant
-    $msg = "Your application for \"{$app['title']}\" has been {$status}.";
-    createNotification((int)$app['seeker_id'], 'application_status', $msg, $appId);
+    jsonResponse(['message' => 'Status updated successfully']);
+}
+?>
+<table id="applications-table">
+  <thead>
+    <tr>
+      <th>Applicant</th>
+      <th>Job Title</th>
+      <th>Current Status</th>
+      <th>Update Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Filled dynamically by JS -->
+  </tbody>
+</table>
+<script>
+    async function loadApplicants() {
+  const tbody = document.querySelector('#applications-table tbody');
+  tbody.innerHTML = '<tr><td colspan="4">Loading…</td></tr>';
 
-    jsonSuccess('Application status updated.', ['status' => $status]);
-    // FIXED: removed the extra stray } that was here causing a PHP parse error
+  try {
+    const applicants = await api.get('applications.php?action=list'); // Employer-specific
+    tbody.innerHTML = '';
+
+    applicants.forEach(app => {
+      let color;
+      switch(app.status){
+        case 'pending':  color = 'orange'; break;
+        case 'accepted': color = 'green';  break;
+        case 'rejected': color = 'red';    break;
+        default:         color = 'gray';
+      }
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${escapeHtml(app.seeker_name)}</td>
+        <td>${escapeHtml(app.job_title)}</td>
+        <td style="color:${color}; font-weight:bold">${app.status}</td>
+        <td>
+          <select onchange="changeStatus(${app.id}, this)">
+            <option value="pending"  ${app.status==='pending'?'selected':''}>Pending</option>
+            <option value="accepted" ${app.status==='accepted'?'selected':''}>Accepted</option>
+            <option value="rejected" ${app.status==='rejected'?'selected':''}>Rejected</option>
+          </select>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+
+  } catch(err){
+    tbody.innerHTML = `<tr><td colspan="4">Failed to load applicants: ${err.message}</td></tr>`;
+  }
 }
 
-// ── Seeker: Submit Application ────────────────────────────────────────────────
-function handleApply(): void
-{
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonError('POST required.', 405);
+// Update status function
+async function changeStatus(applicationId, select){
+  const newStatus = select.value;
 
-    $user  = requireAuth('seeker');
-    $data  = getJson();
-    $jobId = (int)($data['job_id'] ?? 0);
-    if (!$jobId) jsonError('Job ID required.');
+  try {
+    const res = await api.put(`applications.php?action=status&id=${applicationId}`, {
+      status: newStatus
+    });
 
-    $db = getDB();
+    if(res.error) throw new Error(res.error);
 
-    // Check job exists and is open
-    $job = $db->prepare("SELECT id, title, employer_id FROM jobs WHERE id = ? AND status = 'open'");
-    $job->execute([$jobId]);
-    $jobRow = $job->fetch();
-    if (!$jobRow) jsonError('Job not found or no longer accepting applications.', 404);
-
-    // Prevent duplicate applications
-    $dup = $db->prepare("SELECT id FROM applications WHERE job_id = ? AND seeker_id = ?");
-    $dup->execute([$jobId, $user['id']]);
-    if ($dup->fetch()) jsonError('You have already applied for this job.');
-
-    $coverLetter = sanitize($data['cover_letter'] ?? '');
-    $resumePath  = sanitize($data['resume_path']  ?? '');
-
-    $stmt = $db->prepare(
-        "INSERT INTO applications (job_id, seeker_id, cover_letter, resume_path, status, applied_at)
-         VALUES (?, ?, ?, ?, 'pending', NOW())"
-    );
-    $stmt->execute([$jobId, $user['id'], $coverLetter, $resumePath]);
-    $appId = (int)$db->lastInsertId();
-
-    // Notify the employer
-    createNotification(
-        (int)$jobRow['employer_id'],
-        'new_application',
-        "{$user['name']} applied for \"{$jobRow['title']}\"",
-        $appId
-    );
-
-    jsonSuccess('Application submitted successfully.', ['application_id' => $appId]);
+    alert('Status updated successfully!');
+    loadApplicants(); // Refresh table
+  } catch(err) {
+    alert('Failed to update status: ' + err.message);
+  }
 }
+</script>

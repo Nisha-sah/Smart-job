@@ -18,7 +18,7 @@
   <main>
     <div class="container" style="max-width:720px">
       <div class="page-header">
-        <h1>Post a New Job</h1>
+        <h1>Job Posting (Employer)</h1>
         <p class="text-sec">Fill in the details to attract the best candidates</p>
       </div>
 
@@ -139,8 +139,8 @@ document.getElementById('post-job-form').addEventListener('submit', async e => {
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
-    alert('Please log in as an employer first.');
-    window.location.href = 'employer-dashboard.html';
+    alert('Job post sucessfully');
+    window.location.href = 'job-listings.html';
   } catch (err) {
     alert('Error: ' + err.message);
     btn.disabled = false;

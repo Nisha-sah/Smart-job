@@ -4,11 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employer Dashboard — Smart Job Portal</title>
-  <link rel="stylesheet" href="../../Frontend/css/main.css">
+   <link rel="stylesheet" href="../../Frontend/css/main.css">
 </head>
 <body class="page-wrapper">
-
-  <!-- ── Navbar ──────────────────────────────────────────────────────────── -->
   <nav class="navbar">
     <div class="navbar-inner">
       <a href="index.html" class="logo">Job<span>Portal</span></a>
@@ -19,8 +17,6 @@
 
   <main>
     <div class="container">
-
-      <!-- ── Page Header ─────────────────────────────────────────────────── -->
       <div class="page-header flex-between">
         <div>
           <h1 id="greeting">Employer Dashboard</h1>
@@ -29,7 +25,7 @@
         <a href="post-job.html" class="btn btn-primary">+ Post a New Job</a>
       </div>
 
-      <!-- ── Stats (User Story 6.2) ─────────────────────────────────────── -->
+      <!-- Stats -->
       <div class="stats-grid" style="margin-bottom:24px">
         <div class="card stat-card">
           <div class="stat-value" id="stat-total">—</div>
@@ -49,23 +45,20 @@
         </div>
       </div>
 
-      <!-- ── Tabs ────────────────────────────────────────────────────────── -->
+      <!-- Tabs -->
       <div class="tabs">
-        <div class="tab active" id="tab-jobs-btn" onclick="switchTab('jobs', this)">My Job Postings</div>
-        <div class="tab"       id="tab-apps-btn"  onclick="switchTab('apps', this)">Applicants</div>
+        <div class="tab active" onclick="switchTab('jobs', this)">My Job Postings</div>
+        <div class="tab" onclick="switchTab('applicants', this)">Applicants</div>
       </div>
 
-      <!-- ── Alert area ──────────────────────────────────────────────────── -->
-      <div id="page-alert"></div>
-
-      <!-- ── Tab: My Jobs (2.4) ──────────────────────────────────────────── -->
+      <!-- Jobs Tab -->
       <div id="tab-jobs">
         <div id="jobs-list"><div class="loader"></div></div>
       </div>
 
-      <!-- ── Tab: Applicants (4.2) ───────────────────────────────────────── -->
-      <div id="tab-apps" class="hidden">
-        <div class="form-group" style="max-width:380px; margin-bottom:20px">
+      <!-- Applicants Tab -->
+      <div id="tab-applicants" class="hidden">
+        <div class="form-group" style="max-width:360px; margin-bottom:16px">
           <label class="form-label">Select Job to View Applicants</label>
           <select id="job-select" class="form-control" onchange="loadApplicants()">
             <option value="">— choose a job —</option>
@@ -73,11 +66,10 @@
         </div>
         <div id="applicants-list"></div>
       </div>
-
     </div>
   </main>
 
-  <!-- ── Edit Job Modal (2.2) ──────────────────────────────────────────────── -->
+  <!-- Edit Job Modal -->
   <div class="modal-overlay" id="edit-modal">
     <div class="modal">
       <div class="modal-header">
@@ -87,17 +79,14 @@
       <div class="modal-body">
         <div id="edit-alert"></div>
         <input type="hidden" id="edit-job-id">
-
         <div class="form-group">
           <label class="form-label">Job Title *</label>
-          <input type="text" id="edit-title" class="form-control" placeholder="e.g. Senior Developer">
+          <input type="text" id="edit-title" class="form-control">
         </div>
-
         <div class="form-group">
           <label class="form-label">Description *</label>
-          <textarea id="edit-description" class="form-control" rows="5" placeholder="Describe the role…"></textarea>
+          <textarea id="edit-description" class="form-control" rows="5"></textarea>
         </div>
-
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Category</label>
@@ -119,28 +108,24 @@
             </select>
           </div>
         </div>
-
         <div class="form-group">
-          <label class="form-label">Location *</label>
-          <input type="text" id="edit-location" class="form-control" placeholder="e.g. New York, NY">
+          <label class="form-label">Location</label>
+          <input type="text" id="edit-location" class="form-control">
         </div>
-
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Min Salary ($/yr) *</label>
-            <input type="number" id="edit-salary_min" class="form-control" min="0">
+            <label class="form-label">Min Salary ($)</label>
+            <input type="number" id="edit-salary_min" class="form-control">
           </div>
           <div class="form-group">
-            <label class="form-label">Max Salary ($/yr)</label>
-            <input type="number" id="edit-salary_max" class="form-control" min="0">
+            <label class="form-label">Max Salary ($)</label>
+            <input type="number" id="edit-salary_max" class="form-control">
           </div>
         </div>
-
         <div class="form-group">
-          <label class="form-label">Required Skills *</label>
+          <label class="form-label">Skills (comma-separated)</label>
           <input type="text" id="edit-skills" class="form-control" placeholder="e.g. React, Node.js, AWS">
         </div>
-
         <div class="form-group">
           <label class="form-label">Status</label>
           <select id="edit-status" class="form-control">
@@ -156,120 +141,63 @@
     </div>
   </div>
 
-  <!-- ── Delete Confirm Modal (2.3) ────────────────────────────────────────── -->
-  <div class="modal-overlay" id="delete-modal">
-    <div class="modal" style="max-width:420px">
-      <div class="modal-header">
-        <h3>Delete Job Posting</h3>
-        <button class="modal-close" onclick="closeDeleteModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="alert alert-error" style="display:flex">
-          ⚠ This will permanently delete the job and all its applications.
-        </div>
-        <p class="text-sec">Are you sure you want to delete <strong id="delete-job-title" style="color:var(--text-pri)"></strong>?</p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
-        <button class="btn btn-danger" id="confirm-delete-btn" onclick="confirmDelete()">Delete Job</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Scripts ───────────────────────────────────────────────────────────── -->
   <script src="../../Frontend/js/app.js"></script>
   <script>
-    let allJobs        = [];
-    let pendingDeleteId = null;
+    let allJobs = [];
 
-    // ── Init ──────────────────────────────────────────────────────────────────
     async function init() {
-      // requireRole redirects to login if not logged in or wrong role
-      const user = Auth.requireRole('employer', 'login.html');
+      const user = await Auth.requireRole('employer', 'login.html');
       if (!user) return;
-
       document.getElementById('greeting').textContent = `Welcome, ${user.name.split(' ')[0]} 👋`;
-      renderNav();
       await loadJobs();
     }
 
-    // ── Load Jobs (2.4) ───────────────────────────────────────────────────────
     async function loadJobs() {
       const list = document.getElementById('jobs-list');
-      list.innerHTML = '<div class="loader"></div>';
-
       try {
         const data = await api.get('jobs.php?action=my');
-        allJobs    = data.jobs || [];
+        allJobs = data.jobs;
 
-        // Update stat cards
-        const total      = allJobs.length;
-        const open       = allJobs.filter(j => j.status === 'open').length;
-        const closed     = allJobs.filter(j => j.status === 'closed').length;
-        const applicants = allJobs.reduce((sum, j) => sum + Number(j.applicant_count || 0), 0);
+        const total     = allJobs.length;
+        const open      = allJobs.filter(j => j.status === 'open').length;
+        const closed    = allJobs.filter(j => j.status === 'closed').length;
+        const applicants = allJobs.reduce((sum, j) => sum + Number(j.applicant_count), 0);
 
-        document.getElementById('stat-total').textContent      = total;
-        document.getElementById('stat-open').textContent       = open;
-        document.getElementById('stat-closed').textContent     = closed;
+        document.getElementById('stat-total').textContent     = total;
+        document.getElementById('stat-open').textContent      = open;
+        document.getElementById('stat-closed').textContent    = closed;
         document.getElementById('stat-applicants').textContent = applicants;
 
-        // Populate applicants tab dropdown
+        // Populate job select
         const sel = document.getElementById('job-select');
         sel.innerHTML = '<option value="">— choose a job —</option>' +
-          allJobs.map(j =>
-            `<option value="${j.id}">${j.title} (${j.applicant_count} applicants)</option>`
-          ).join('');
+          allJobs.map(j => `<option value="${j.id}">${j.title} (${j.applicant_count} applicants)</option>`).join('');
 
-        // Empty state
         if (!allJobs.length) {
-          list.innerHTML = `
-            <div class="empty-state">
-              <div class="icon">📋</div>
-              <h3>No jobs posted yet</h3>
-              <p>Create your first job listing to start receiving applications</p>
-              <a href="post-job.html" class="btn btn-primary mt-16">Post a Job</a>
-            </div>`;
+          list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><h3>No jobs posted yet</h3><p>Create your first job listing to start receiving applications</p><a href="post-job.html" class="btn btn-primary mt-16">Post a Job</a></div>`;
           return;
         }
 
-        // Jobs table
         list.innerHTML = `
-          <div class="table-wrap card" style="padding:0; overflow:hidden">
+          <div class="table-wrap card" style="padding:0">
             <table>
               <thead>
-                <tr>
-                  <th>Job Title</th>
-                  <th>Type</th>
-                  <th>Location</th>
-                  <th>Salary</th>
-                  <th>Applicants</th>
-                  <th>Status</th>
-                  <th>Posted</th>
-                  <th>Actions</th>
-                </tr>
+                <tr><th>Job Title</th><th>Type</th><th>Location</th><th>Salary</th><th>Applicants</th><th>Status</th><th>Posted</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 ${allJobs.map(j => `
                   <tr>
-                    <td>
-                      <strong>${j.title}</strong>
-                      ${j.category ? `<div class="text-muted" style="font-size:12px">${j.category}</div>` : ''}
-                    </td>
+                    <td><strong>${j.title}</strong>${j.category ? `<div class="text-muted" style="font-size:12px">${j.category}</div>` : ''}</td>
                     <td><span class="badge badge-gray">${j.job_type}</span></td>
-                    <td class="text-sec">${j.location || '—'}</td>
+                    <td>${j.location || '—'}</td>
                     <td>${formatSalary(j.salary_min, j.salary_max)}</td>
-                    <td>
-                      <span class="badge badge-accent" style="cursor:pointer"
-                        onclick="switchTab('apps', this); loadApplicantsForJob(${j.id})">
-                        ${j.applicant_count}
-                      </span>
-                    </td>
+                    <td><span class="badge badge-accent">${j.applicant_count}</span></td>
                     <td>${statusBadge(j.status)}</td>
                     <td class="text-muted">${formatDate(j.created_at)}</td>
                     <td>
-                      <div style="display:flex; gap:6px">
+                      <div style="display:flex;gap:6px">
                         <button class="btn btn-sm btn-outline" onclick="openEdit(${j.id})">Edit</button>
-                        <button class="btn btn-sm btn-danger"  onclick="openDelete(${j.id}, '${j.title.replace(/'/g,"\\'")}')">Delete</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteJob(${j.id}, this)">Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -277,16 +205,9 @@
               </tbody>
             </table>
           </div>`;
-
       } catch (err) {
         list.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
       }
-    }
-
-    // ── Load Applicants for a specific job (4.2) ──────────────────────────────
-    async function loadApplicantsForJob(jobId) {
-      document.getElementById('job-select').value = jobId;
-      await loadApplicants();
     }
 
     async function loadApplicants() {
@@ -295,18 +216,12 @@
       if (!jobId) { list.innerHTML = ''; return; }
 
       list.innerHTML = '<div class="loader"></div>';
-
       try {
         const data = await api.get(`applications.php?action=job&job_id=${jobId}`);
-        const apps = data.applications || [];
+        const apps = data.applications;
 
         if (!apps.length) {
-          list.innerHTML = `
-            <div class="empty-state">
-              <div class="icon">👥</div>
-              <h3>No applicants yet</h3>
-              <p>Share this job to attract candidates</p>
-            </div>`;
+          list.innerHTML = `<div class="empty-state"><div class="icon">👥</div><h3>No applicants yet</h3><p>Share this job to attract candidates</p></div>`;
           return;
         }
 
@@ -314,35 +229,21 @@
           <div class="jobs-grid">
             ${apps.map(a => `
               <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
                   <div>
-                    <div style="font-weight:700; font-size:16px; margin-bottom:2px">${a.name}</div>
-                    <div class="text-sec" style="font-size:13px">
-                      ${a.email}${a.phone ? ' · ' + a.phone : ''}
-                    </div>
+                    <div style="font-weight:700;font-size:16px">${a.name}</div>
+                    <div class="text-sec" style="font-size:13px">${a.email}${a.phone ? ' · ' + a.phone : ''}</div>
                     ${a.location ? `<div class="text-muted" style="font-size:13px">📍 ${a.location}</div>` : ''}
-                    <div style="margin-top:6px; font-size:12px; color:var(--text-muted)">
-                      Applied ${formatDate(a.applied_at)}
-                    </div>
+                    <div style="margin-top:8px;font-size:13px;color:var(--text-muted)">Applied ${formatDate(a.applied_at)}</div>
                   </div>
-                  <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px">
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
                     ${statusBadge(a.status)}
-                    ${a.resume_path
-                      ? `<a href="../${a.resume_path}" target="_blank" class="btn btn-outline btn-sm">📄 Resume</a>`
-                      : '<span class="text-muted" style="font-size:12px">No resume</span>'}
+                    ${a.resume_path ? `<a href="../${a.resume_path}" target="_blank" class="btn btn-outline btn-sm">📄 Resume</a>` : '<span class="text-muted" style="font-size:12px">No resume</span>'}
                   </div>
                 </div>
-
-                ${a.cover_letter ? `
-                  <div style="margin-top:12px; padding-top:12px; border-top:1px solid var(--border);
-                              font-size:13px; color:var(--text-sec); line-height:1.6">
-                    ${a.cover_letter}
-                  </div>` : ''}
-
-                <!-- Status actions (4.3) -->
-                <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap">
-                  <button class="btn btn-sm"
-                    style="background:rgba(0,200,150,0.15); color:var(--green); border:1px solid rgba(0,200,150,0.3)"
+                ${a.cover_letter ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;color:var(--text-sec)">${a.cover_letter}</div>` : ''}
+                <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+                  <button class="btn btn-sm" style="background:rgba(0,200,150,0.15);color:var(--green);border:1px solid rgba(0,200,150,0.3)"
                     onclick="updateStatus(${a.id}, 'accepted', this)">✓ Accept</button>
                   <button class="btn btn-sm btn-danger"
                     onclick="updateStatus(${a.id}, 'rejected', this)">✕ Reject</button>
@@ -352,42 +253,35 @@
               </div>
             `).join('')}
           </div>`;
-
       } catch (err) {
         list.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
       }
     }
 
-    // ── Update Application Status (4.3) ──────────────────────────────────────
     async function updateStatus(appId, status, btn) {
       setLoading(btn, true, '…');
       try {
         await api.put(`applications.php?action=status&id=${appId}`, { status });
-        await loadApplicants();
-        showAlert('#page-alert', `Application marked as <strong>${status}</strong>.`, 'success', 3000);
+        loadApplicants();
       } catch (err) {
-        showAlert('#page-alert', err.message, 'error', 4000);
+        alert(err.message);
         setLoading(btn, false);
       }
     }
 
-    // ── Edit Job (2.2) ────────────────────────────────────────────────────────
     function openEdit(jobId) {
       const job = allJobs.find(j => j.id == jobId);
       if (!job) return;
-
-      document.getElementById('edit-job-id').value       = job.id;
-      document.getElementById('edit-title').value        = job.title;
-      document.getElementById('edit-description').value  = job.description || '';
-      document.getElementById('edit-category').value     = job.category    || '';
-      document.getElementById('edit-job_type').value     = job.job_type;
-      document.getElementById('edit-location').value     = job.location    || '';
-      document.getElementById('edit-salary_min').value   = job.salary_min  || '';
-      document.getElementById('edit-salary_max').value   = job.salary_max  || '';
-      document.getElementById('edit-skills').value       = job.skills      || '';
-      document.getElementById('edit-status').value       = job.status;
-      document.getElementById('edit-alert').innerHTML    = '';
-
+      document.getElementById('edit-job-id').value        = job.id;
+      document.getElementById('edit-title').value         = job.title;
+      document.getElementById('edit-description').value   = job.description;
+      document.getElementById('edit-category').value      = job.category || '';
+      document.getElementById('edit-job_type').value      = job.job_type;
+      document.getElementById('edit-location').value      = job.location || '';
+      document.getElementById('edit-salary_min').value    = job.salary_min || '';
+      document.getElementById('edit-salary_max').value    = job.salary_max || '';
+      document.getElementById('edit-skills').value        = job.skills || '';
+      document.getElementById('edit-status').value        = job.status;
       document.getElementById('edit-modal').classList.add('open');
     }
 
@@ -399,83 +293,45 @@
       const jobId = document.getElementById('edit-job-id').value;
       const btn   = document.getElementById('save-edit-btn');
       setLoading(btn, true, 'Saving…');
-
       try {
         await api.put(`jobs.php?action=update&id=${jobId}`, {
-          title:       document.getElementById('edit-title').value.trim(),
-          description: document.getElementById('edit-description').value.trim(),
+          title:       document.getElementById('edit-title').value,
+          description: document.getElementById('edit-description').value,
           category:    document.getElementById('edit-category').value,
           job_type:    document.getElementById('edit-job_type').value,
-          location:    document.getElementById('edit-location').value.trim(),
-          salary_min:  document.getElementById('edit-salary_min').value || 0,
-          salary_max:  document.getElementById('edit-salary_max').value || 0,
-          skills:      document.getElementById('edit-skills').value.trim(),
+          location:    document.getElementById('edit-location').value,
+          salary_min:  document.getElementById('edit-salary_min').value,
+          salary_max:  document.getElementById('edit-salary_max').value,
+          skills:      document.getElementById('edit-skills').value,
           status:      document.getElementById('edit-status').value,
         });
-
         closeEditModal();
         await loadJobs();
-        showAlert('#page-alert', 'Job updated successfully.', 'success', 3000);
-
       } catch (err) {
         showAlert('#edit-alert', err.message, 'error');
         setLoading(btn, false);
       }
     }
 
-    // ── Delete Job (2.3) ──────────────────────────────────────────────────────
-    function openDelete(jobId, jobTitle) {
-      pendingDeleteId = jobId;
-      document.getElementById('delete-job-title').textContent = `"${jobTitle}"`;
-      document.getElementById('delete-modal').classList.add('open');
-    }
-
-    function closeDeleteModal() {
-      pendingDeleteId = null;
-      document.getElementById('delete-modal').classList.remove('open');
-    }
-
-    async function confirmDelete() {
-      if (!pendingDeleteId) return;
-      const btn = document.getElementById('confirm-delete-btn');
-      setLoading(btn, true, 'Deleting…');
-
+    async function deleteJob(jobId, btn) {
+      if (!confirm('Delete this job posting? This cannot be undone.')) return;
+      setLoading(btn, true, '…');
       try {
-        await api.delete(`jobs.php?action=delete&id=${pendingDeleteId}`);
-        closeDeleteModal();
+        await api.delete(`jobs.php?action=delete&id=${jobId}`);
         await loadJobs();
-        showAlert('#page-alert', 'Job deleted successfully.', 'success', 3000);
       } catch (err) {
-        showAlert('#page-alert', err.message, 'error', 4000);
+        alert(err.message);
         setLoading(btn, false);
-        closeDeleteModal();
       }
     }
 
-    // ── Tab Switching ─────────────────────────────────────────────────────────
     function switchTab(tab, el) {
-      // Update tab buttons
-      document.getElementById('tab-jobs-btn').classList.toggle('active', tab === 'jobs');
-      document.getElementById('tab-apps-btn').classList.toggle('active', tab === 'apps');
-
-      // Show/hide panels
-      document.getElementById('tab-jobs').classList.toggle('hidden', tab !== 'jobs');
-      document.getElementById('tab-apps').classList.toggle('hidden', tab !== 'apps');
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      ['jobs','applicants'].forEach(t =>
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab)
+      );
     }
-
-    // ── Close modals on overlay click ─────────────────────────────────────────
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay) overlay.classList.remove('open');
-      });
-    });
-
-    // ── Close modals on Escape ────────────────────────────────────────────────
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
-      }
-    });
 
     init();
   </script>

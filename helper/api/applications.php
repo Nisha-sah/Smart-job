@@ -63,3 +63,24 @@ function handleListApplications(): void
     ]);
 }
 
+<div id="tab-apps" class="hidden">
+  <select id="job-select" onchange="loadApplicants()">
+    <option value="">— choose a job —</option>
+  </select>
+  <div id="applicants-list"></div>
+</div>
+<script>
+  async function loadApplicants() {
+  const jobId = document.getElementById('job-select').value;
+  const list  = document.getElementById('applicants-list');
+  const data  = await api.get(`applications.php?action=job&job_id=${jobId}`);
+  const apps  = data.applications || [];
+  
+  // Render applicants
+  list.innerHTML = apps.map(a => `
+    <div class="card">
+      <div>${a.name} — ${a.email}</div>
+      ...
+    </div>`).join('');
+}
+</script>
