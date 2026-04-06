@@ -1,0 +1,497 @@
+/* --- Global Styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --primary-color: #20b2aa; /* Vibrant Teal */
+    --dark-bg: #121212;
+    --text-gray: #777;
+    --border-color: #eee;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* --- Header & Hero --- */
+header {
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding-bottom: 50px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 8%;
+}
+
+.logo { font-weight: 700; font-size: 1.5rem; color: white; text-decoration: none; }
+.nav-links { list-style: none; display: flex; gap: 30px; }
+.nav-links a { color: white; text-decoration: none; font-size: 0.9rem; transition: 0.3s; }
+.nav-links a:hover { color: var(--primary-color); }
+
+.auth-buttons .login-btn { color: white; text-decoration: none; margin-right: 20px; }
+.register-btn { 
+    background: var(--primary-color); 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    text-decoration: none; 
+    color: white; 
+    font-weight: 600;
+}
+
+.hero {
+    text-align: center;
+    padding: 100px 10%;
+}
+
+.hero h1 { font-size: 3rem; margin-bottom: 10px; }
+.hero p { margin-bottom: 40px; opacity: 0.8; font-size: 1.1rem; }
+
+/* --- Search Bar --- */
+.search-container {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    max-width: 900px;
+    margin: 0 auto 50px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.search-container input, .search-container select {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 5px;
+    flex: 1;
+    outline: none;
+}
+
+.search-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* --- Stats --- */
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.stat-item {
+    background: rgba(255,255,255,0.1);
+    padding: 15px 25px;
+    border-radius: 30px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 0.9rem;
+}
+
+/* --- Job List Section --- */
+.container { padding: 80px 8%; }
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.view-all { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+
+.job-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: 2fr 3fr 1fr;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    transition: 0.3s;
+}
+
+.job-card:hover { 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transform: translateY(-3px);
+}
+
+.job-info { display: flex; gap: 15px; align-items: center; }
+.company-logo { width: 50px; height: 50px; border-radius: 8px; }
+.red { background: #ff4d4d; }
+.orange { background: #ffa500; }
+
+.job-meta { display: flex; flex-wrap: wrap; gap: 20px; color: var(--text-gray); font-size: 0.85rem; }
+.job-meta i { color: var(--primary-color); margin-right: 5px; }
+
+.details-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.save-icon { position: absolute; right: 25px; top: 25px; color: #ccc; cursor: pointer; font-size: 1.2rem; }
+
+/* --- Footer --- */
+footer {
+    background: #000;
+    color: white;
+    padding: 80px 8% 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 50px;
+    margin-bottom: 50px;
+}
+
+.footer-section h3 { margin-bottom: 20px; }
+.footer-section ul { list-style: none; }
+.footer-section li { margin-bottom: 10px; color: #aaa; cursor: pointer; transition: 0.3s; }
+.footer-section li:hover { color: white; }
+
+.footer-bottom {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+/* --- LOGIN PAGE SPECIFIC STYLES --- */
+/* Login body background only when .login-page class is active */
+.login-page {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-wrapper {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.login-header i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.login-header h2 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.login-header p {
+    color: #777;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 600;
+}
+
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-field i {
+    position: absolute;
+    left: 15px;
+    color: #aaa;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 1.5px solid #eee;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-field input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(32, 178, 170, 0.2);
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-bottom: 25px;
+    color: #666;
+}
+
+.form-options a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.login-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    background: #17918a;
+    transform: translateY(-2px);
+}
+
+.login-footer {
+    margin-top: 25px;
+    font-size: 0.85rem;
+    color: #777;
+}
+
+.login-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/*REGISTRATION */
+
+/* --- REGISTRATION PAGE SPECIFIC STYLES --- */
+.register-page {
+    background: #f4f7f6; /* Light gray background */
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.register-wrapper {
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 1000px; /* Ali thulo banako split layout ko lagi */
+    min-height: 600px;
+}
+
+/* Left Side Image Section */
+.register-side-image {
+    flex: 1;
+    background: linear-gradient(rgba(32, 178, 170, 0.8), rgba(0, 0, 0, 0.5)), 
+                url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=800&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: white;
+    text-align: center;
+}
+
+/* Responsive: Mobile ma image lukaucha */
+@media (max-width: 768px) {
+    .register-side-image {
+        display: none;
+    }
+    .register-wrapper {
+        max-width: 450px;
+    }
+}
+
+.overlay-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.overlay-text p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Right Side Form Section */
+.register-card {
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: white;
+}
+
+.register-header {
+    margin-bottom: 30px;
+    text-align: left; /* Left align for modern look */
+}
+
+.register-header h2 {
+    font-size: 2rem;
+    color: #333;
+}
+
+/* Input Row for side-by-side inputs if needed */
+.input-row {
+    width: 100%;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-field i {
+    position: absolute;
+    left: 15px;
+    color: var(--primary-color);
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border: 1.5px solid #eee;
+    border-radius: 8px;
+    outline: none;
+    transition: 0.3s;
+    background: #f9f9f9;
+}
+
+.input-field input:focus {
+    border-color: var(--primary-color);
+    background: white;
+    box-shadow: 0 0 10px rgba(32, 178, 170, 0.1);
+}
+
+/* User Type Selector */
+.user-type-selector {
+    display: flex;
+    gap: 15px;
+    margin-top: 5px;
+}
+
+.user-type-selector input[type="radio"] {
+    display: none;
+}
+
+.user-type-selector label {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border: 1.5px solid #eee;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: white;
+}
+
+.user-type-selector input:checked + label {
+    border-color: var(--primary-color);
+    background: rgba(32, 178, 170, 0.1);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.register-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.register-btn:hover {
+    background: #17918a;
+    transform: translateY(-2px);
+}
+
+.register-footer {
+    margin-top: 25px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.register-footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
