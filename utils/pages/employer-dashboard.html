@@ -54,6 +54,8 @@
     .btn-danger:hover { background: rgba(255,79,106,0.22); }
     .btn-success { background: rgba(0,200,150,0.12); border: 1px solid rgba(0,200,150,0.3); color: var(--green); }
     .btn-success:hover { background: rgba(0,200,150,0.22); }
+    .btn-info { background: var(--accent-dim); border: 1px solid rgba(0,212,170,0.3); color: var(--accent); }
+    .btn-info:hover { background: rgba(0,212,170,0.18); }
     .btn-sm { padding: 6px 14px; font-size: 12px; }
     .btn-xs { padding: 4px 10px; font-size: 11px; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
@@ -89,21 +91,12 @@
     .stat-icon { font-size: 22px; margin-bottom: 12px; }
     .stat-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 30px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 4px; }
     .stat-label { font-size: 12px; color: var(--text-sec); font-weight: 500; }
-    .stat-change { font-size: 11px; color: var(--green); margin-top: 6px; }
 
     /* ── CARDS ── */
     .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); }
     .card-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
     .card-header h3 { font-size: 16px; font-weight: 700; }
     .card-body { padding: 22px; }
-
-    /* ── TABS ── */
-    .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
-    .tab { padding: 11px 20px; font-size: 13px; font-weight: 600; color: var(--text-sec); cursor: pointer; border-bottom: 2px solid transparent; transition: var(--transition); font-family: 'Plus Jakarta Sans', sans-serif; white-space: nowrap; }
-    .tab:hover { color: var(--text-pri); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
 
     /* ── ALERTS ── */
     .alert { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 16px; }
@@ -139,7 +132,7 @@
     .applicant-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; color: var(--text-pri); margin-bottom: 2px; }
     .applicant-email { font-size: 12px; color: var(--text-sec); }
     .applicant-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
-    .cover-letter-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 12px; max-height: 100px; overflow: hidden; position: relative; }
+    .cover-letter-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; color: var(--text-sec); line-height: 1.6; margin-bottom: 12px; max-height: 100px; overflow: hidden; }
     .cover-letter-box.expanded { max-height: none; }
     .status-action-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .status-btn { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; transition: var(--transition); font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -164,7 +157,7 @@
     /* ── MODAL ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 500; display: none; align-items: center; justify-content: center; padding: 24px; }
     .modal-overlay.open { display: flex; }
-    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: slideUp 0.2s ease; }
+    .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); width: 100%; max-width: 620px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow); animation: slideUp 0.2s ease; }
     .modal-sm { max-width: 420px; }
     @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
     .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); }
@@ -173,6 +166,14 @@
     .modal-close:hover { border-color: var(--red); color: var(--red); }
     .modal-body { padding: 22px 24px; }
     .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ── JOB DETAIL MODAL ── */
+    .detail-section { margin-bottom: 20px; }
+    .detail-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+    .detail-value { font-size: 14px; color: var(--text-pri); line-height: 1.6; }
+    .detail-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .detail-meta-item { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+    .skill-pill { display: inline-flex; padding: 4px 12px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; font-size: 12px; color: var(--text-sec); margin: 3px; }
 
     /* ── LOADER ── */
     .loader { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 40px auto; }
@@ -195,15 +196,14 @@
     .job-select-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
     .job-select-bar select { flex: 1; min-width: 220px; }
 
-    /* ── REVIEW BACK BUTTON ── */
-    .back-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-sec); cursor: pointer; margin-bottom: 20px; background: none; border: none; transition: color var(--transition); }
-    .back-btn:hover { color: var(--accent); }
-
     /* ── UTILITIES ── */
     .hidden { display: none !important; }
     .flex-between { display: flex; justify-content: space-between; align-items: center; }
     .mt-16 { margin-top: 16px; }
     .text-muted { color: var(--text-muted); font-size: 13px; }
+
+    /* ── MY JOBS TABLE (Edit/Delete lives here) ── */
+    #tab-myjobs .action-btns { display: flex; gap: 6px; }
 
     @media (max-width: 900px) {
       .page-layout { grid-template-columns: 1fr; }
@@ -212,6 +212,7 @@
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
       .form-row { grid-template-columns: 1fr; }
       .main-content { padding: 20px; }
+      .detail-meta-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
       .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -278,7 +279,8 @@
     <div id="page-alert"></div>
 
     <!-- ══════════════════════════════════════════════════════
-         TAB: OVERVIEW DASHBOARD (6.2)
+         TAB: OVERVIEW DASHBOARD
+         Shows ALL jobs with View Details button (no Edit/Delete)
     ══════════════════════════════════════════════════════ -->
     <div id="tab-overview" class="tab-content active">
       <div class="page-header">
@@ -315,25 +317,26 @@
         </div>
       </div>
 
-      <!-- Recent Jobs Preview -->
+      <!-- All Jobs — View Details only -->
       <div class="card">
         <div class="card-header">
-          <h3>Recent Job Postings</h3>
-          <button class="btn btn-outline btn-sm" onclick="switchTab('myjobs')">View All →</button>
+          <h3>All Job Postings</h3>
+          <span class="text-muted" id="overview-count-label">Loading…</span>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>Job</th>
+                <th>Type</th>
                 <th>Status</th>
                 <th>Applicants</th>
                 <th>Posted</th>
-                <th>Actions</th>
+                <th>Details</th>
               </tr>
             </thead>
             <tbody id="overview-jobs-tbody">
-              <tr class="loading-row"><td colspan="5"><div class="loader"></div></td></tr>
+              <tr class="loading-row"><td colspan="6"><div class="loader"></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -341,13 +344,13 @@
     </div>
 
     <!-- ══════════════════════════════════════════════════════
-         TAB: MY POSTED JOBS (2.4)
+         TAB: MY POSTED JOBS (2.4) — Edit & Delete available here
     ══════════════════════════════════════════════════════ -->
-    <div id="tab-myjobs" class="tab-content">
+    <div id="tab-myjobs" class="tab-content hidden">
       <div class="page-header">
         <div>
-          <h1>View Posted Jobs</h1>
-          <p>Manage all your job listings.</p>
+          <h1>My Posted Jobs</h1>
+          <p>Manage all your job listings — edit, delete, or review applicants.</p>
         </div>
         <div class="header-actions">
           <a href="post-job.html" class="btn btn-primary">➕ Post New Job</a>
@@ -383,7 +386,7 @@
     <!-- ══════════════════════════════════════════════════════
          TAB: REVIEW APPLICATIONS (4.2 & 4.3)
     ══════════════════════════════════════════════════════ -->
-    <div id="tab-applicants" class="tab-content">
+    <div id="tab-applicants" class="tab-content hidden">
       <div class="page-header">
         <div>
           <h1>Review Applications</h1>
@@ -417,7 +420,27 @@
 
 
 <!-- ══════════════════════════════════════════════════════
-     MODAL: EDIT JOB (2.2)
+     MODAL: VIEW JOB DETAILS (Overview → View Details)
+══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📋 Job Details</h3>
+      <button class="modal-close" onclick="closeDetailModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detail-modal-body">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeDetailModal()">Close</button>
+      <button class="btn btn-primary" id="detail-edit-btn" onclick="goToEditFromDetail()">✏️ Edit This Job</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: EDIT JOB (2.2) — accessed from My Jobs tab
 ══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="edit-modal">
   <div class="modal">
@@ -559,8 +582,6 @@ const Auth = {
   const user = Auth.getUser();
   if (!user) { window.location.href = 'login.html'; return; }
   if (user.role !== 'employer') { window.location.href = 'login.html'; return; }
-
-  // Populate navbar user info
   const initials = user.name ? user.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) : 'E';
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('user-name-display').textContent = user.name || 'Employer';
@@ -615,18 +636,26 @@ function showToast(msg, type = 'success') {
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let myJobs = [];
 let pendingDeleteId = null;
+let detailJobId = null; // tracks which job is open in detail modal
 
 // ── TAB SWITCHING ─────────────────────────────────────────────────────────────
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  document.getElementById(`tab-${tab}`).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(el => {
+    el.classList.remove('active');
+    el.classList.add('hidden');
+  });
+  document.querySelectorAll('.nav-item[data-tab]').forEach(el => el.classList.remove('active'));
+
+  const target = document.getElementById(`tab-${tab}`);
+  target.classList.remove('hidden');
+  target.classList.add('active');
   document.querySelector(`.nav-item[data-tab="${tab}"]`)?.classList.add('active');
+
   if (tab === 'applicants') populateJobSelect();
 }
 
 // ══════════════════════════════════════════════════════════════
-// 6.2 — LOAD DASHBOARD DATA
+// LOAD DASHBOARD DATA
 // ══════════════════════════════════════════════════════════════
 async function loadDashboard() {
   try {
@@ -635,10 +664,9 @@ async function loadDashboard() {
     myJobs = data.jobs || [];
 
     // ── Stats ──
-    const totalJobs  = myJobs.length;
-    const openJobs   = myJobs.filter(j => j.status === 'open').length;
-    const totalApps  = myJobs.reduce((s, j) => s + parseInt(j.applicant_count || 0), 0);
-    // We'll count pending from applicants — use a simple estimate from job count
+    const totalJobs = myJobs.length;
+    const openJobs  = myJobs.filter(j => j.status === 'open').length;
+    const totalApps = myJobs.reduce((s, j) => s + parseInt(j.applicant_count || 0), 0);
     const pendingEst = myJobs.filter(j => j.status === 'open').reduce((s, j) => s + parseInt(j.applicant_count || 0), 0);
 
     document.getElementById('stat-total-jobs').textContent = totalJobs;
@@ -646,34 +674,31 @@ async function loadDashboard() {
     document.getElementById('stat-total-apps').textContent = totalApps;
     document.getElementById('stat-pending').textContent    = pendingEst;
     document.getElementById('jobs-count-badge').textContent = totalJobs;
+    document.getElementById('overview-count-label').textContent = `${totalJobs} job${totalJobs !== 1 ? 's' : ''}`;
 
-    // ── Overview table (recent 5) ──
-    renderJobsTable('overview-jobs-tbody', myJobs.slice(0, 5), true);
+    // ── Overview: ALL jobs, View Details only ──
+    renderOverviewTable(myJobs);
 
-    // ── My Jobs table (all) ──
-    renderJobsTable('myjobs-tbody', myJobs, false);
+    // ── My Jobs: all jobs with Edit/Delete ──
+    renderMyJobsTable(myJobs);
     document.getElementById('myjobs-count-label').textContent =
       `${totalJobs} job${totalJobs !== 1 ? 's' : ''}`;
 
-    // ── Job select for applicants ──
     populateJobSelect();
 
   } catch (err) {
     showAlert('Failed to load dashboard: ' + err.message, 'error');
-    document.getElementById('overview-jobs-tbody').innerHTML =
-      `<tr><td colspan="5" style="text-align:center; color:var(--red); padding:24px">⚠️ ${escapeHtml(err.message)}</td></tr>`;
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-// 2.4 — RENDER JOBS TABLE
+// OVERVIEW TABLE — ALL jobs, "View Details" button only
 // ══════════════════════════════════════════════════════════════
-function renderJobsTable(tbodyId, jobs, compact) {
-  const tbody = document.getElementById(tbodyId);
+function renderOverviewTable(jobs) {
+  const tbody = document.getElementById('overview-jobs-tbody');
   if (!jobs.length) {
-    const cols = compact ? 5 : 7;
     tbody.innerHTML = `
-      <tr><td colspan="${cols}">
+      <tr><td colspan="6">
         <div class="empty-state">
           <div class="icon">📋</div>
           <h3>No jobs posted yet</h3>
@@ -695,23 +720,151 @@ function renderJobsTable(tbodyId, jobs, compact) {
           </div>
         </div>
       </td>
-      ${!compact ? `<td>${typePill(job.job_type)}</td>` : ''}
-      ${!compact ? `<td>${formatSalary(job.salary_min, job.salary_max)}</td>` : ''}
+      <td>${typePill(job.job_type)}</td>
       <td>${statusBadge(job.status)}</td>
       <td>
-        <span class="badge badge-accent" onclick="viewApplicantsForJob(${job.id})" title="Review applicants">
+        <span class="badge badge-accent" onclick="viewApplicantsForJob(${job.id})" title="Review applicants" style="cursor:pointer;">
+          ${parseInt(job.applicant_count || 0)} applicants
+        </span>
+      </td>
+      <td style="color:var(--text-muted); font-size:12px">${formatDate(job.created_at)}</td>
+      <td>
+        <button class="btn btn-info btn-xs" onclick="openDetailModal(${job.id})">🔍 View Details</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MY JOBS TABLE — Edit & Delete available
+// ══════════════════════════════════════════════════════════════
+function renderMyJobsTable(jobs) {
+  const tbody = document.getElementById('myjobs-tbody');
+  if (!jobs.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="7">
+        <div class="empty-state">
+          <div class="icon">📋</div>
+          <h3>No jobs posted yet</h3>
+          <p>Create your first listing to start receiving applications</p>
+          <a href="post-job.html" class="btn btn-primary btn-sm">➕ Post a Job</a>
+        </div>
+      </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = jobs.map(job => `
+    <tr>
+      <td>
+        <div class="job-title-cell">
+          <div class="title">${escapeHtml(job.title)}</div>
+          <div class="meta">
+            <span>📍 ${escapeHtml(job.location || 'Remote')}</span>
+            ${job.category ? `<span>🏷️ ${escapeHtml(job.category)}</span>` : ''}
+          </div>
+        </div>
+      </td>
+      <td>${typePill(job.job_type)}</td>
+      <td>${formatSalary(job.salary_min, job.salary_max)}</td>
+      <td>${statusBadge(job.status)}</td>
+      <td>
+        <span class="badge badge-accent" onclick="viewApplicantsForJob(${job.id})" title="Review applicants" style="cursor:pointer;">
           ${parseInt(job.applicant_count || 0)} applicants
         </span>
       </td>
       <td style="color:var(--text-muted); font-size:12px">${formatDate(job.created_at)}</td>
       <td>
         <div class="action-btns">
-          <button class="btn btn-outline btn-xs" onclick="openEditModal(${job.id})" title="Edit job">✏️ Edit</button>
-          <button class="btn btn-danger btn-xs" onclick="openDeleteModal(${job.id}, '${escapeHtml(job.title)}')" title="Delete job">🗑️</button>
+          <button class="btn btn-outline btn-xs" onclick="openEditModal(${job.id})">✏️ Edit</button>
+          <button class="btn btn-danger btn-xs" onclick="openDeleteModal(${job.id}, '${escapeHtml(job.title)}')">🗑️</button>
         </div>
       </td>
     </tr>
   `).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// VIEW DETAILS MODAL
+// ══════════════════════════════════════════════════════════════
+function openDetailModal(jobId) {
+  const job = myJobs.find(j => j.id == jobId);
+  if (!job) return;
+  detailJobId = jobId;
+
+  const skills = job.skills
+    ? job.skills.split(',').map(s => `<span class="skill-pill">${escapeHtml(s.trim())}</span>`).join('')
+    : '<span style="color:var(--text-muted); font-size:13px">No skills listed</span>';
+
+  document.getElementById('detail-modal-body').innerHTML = `
+    <div class="detail-section">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px;">
+        <div>
+          <h2 style="font-size:20px; font-weight:800; margin-bottom:4px;">${escapeHtml(job.title)}</h2>
+          <div style="font-size:13px; color:var(--text-sec);">${escapeHtml(job.employer_name || 'Your Company')}</div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          ${statusBadge(job.status)}
+          ${typePill(job.job_type)}
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-meta-grid">
+      <div class="detail-meta-item">
+        <div class="detail-label">📍 Location</div>
+        <div class="detail-value">${escapeHtml(job.location || 'Remote')}</div>
+      </div>
+      <div class="detail-meta-item">
+        <div class="detail-label">💰 Salary</div>
+        <div class="detail-value">${formatSalary(job.salary_min, job.salary_max)}</div>
+      </div>
+      <div class="detail-meta-item">
+        <div class="detail-label">🏷️ Category</div>
+        <div class="detail-value">${escapeHtml(job.category || '—')}</div>
+      </div>
+      <div class="detail-meta-item">
+        <div class="detail-label">📅 Posted</div>
+        <div class="detail-value">${formatDate(job.created_at)}</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">👥 Applicants</div>
+      <div style="margin-top:6px;">
+        <span class="badge badge-accent" onclick="viewApplicantsForJob(${job.id}); closeDetailModal();" style="cursor:pointer; font-size:13px; padding:5px 14px;">
+          ${parseInt(job.applicant_count || 0)} applicant${parseInt(job.applicant_count || 0) !== 1 ? 's' : ''} — Click to Review
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">🛠️ Required Skills</div>
+      <div style="margin-top:8px;">${skills}</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">📝 Job Description</div>
+      <div class="detail-value" style="margin-top:8px; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; white-space:pre-wrap; max-height:220px; overflow-y:auto;">
+        ${escapeHtml(job.description || 'No description provided.')}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('detail-modal').classList.remove('open');
+  detailJobId = null;
+}
+
+// "Edit This Job" from detail modal → opens edit modal
+function goToEditFromDetail() {
+  if (!detailJobId) return;
+  closeDetailModal();
+  // Switch to My Jobs tab then open edit modal
+  switchTab('myjobs');
+  setTimeout(() => openEditModal(detailJobId), 200);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -777,7 +930,7 @@ async function saveEdit() {
     setTimeout(async () => {
       closeEditModal();
       btn.disabled = false; btn.textContent = '💾 Save Changes';
-      await loadDashboard(); // Immediately reflects updated data (Req 2.2)
+      await loadDashboard();
       showToast('Job post updated successfully!');
     }, 900);
 
@@ -813,7 +966,7 @@ async function confirmDelete() {
     if (data.error) throw new Error(data.error);
 
     closeDeleteModal();
-    await loadDashboard(); // Job removed from listings (Req 2.3)
+    await loadDashboard();
     showToast('Job post deleted permanently.');
 
   } catch (err) {
@@ -909,7 +1062,6 @@ async function loadApplicants() {
             📄 View Resume
           </a>` : ''}
 
-        <!-- 4.3: Status update buttons -->
         <div class="status-action-row">
           <span style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.4px; margin-right:4px">Update Status:</span>
           <button class="status-btn pending ${(app.status||'pending')==='pending'?'active-status':''}"
@@ -931,31 +1083,28 @@ function toggleCover(appId) {
   document.getElementById(`cl-${appId}`)?.classList.toggle('expanded');
 }
 
-// ══════════════════════════════════════════════════════════════
 // 4.3 — UPDATE APPLICATION STATUS
-// ══════════════════════════════════════════════════════════════
+
 async function updateStatus(appId, newStatus, clickedBtn) {
-  // Optimistic UI update
   const card = document.getElementById(`app-card-${appId}`);
   card.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active-status'));
   clickedBtn.classList.add('active-status');
-  card.querySelector('.badge').className = `badge ${{ pending:'badge-yellow', accepted:'badge-green', rejected:'badge-red' }[newStatus]}`;
-  card.querySelector('.badge').textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+  const badgeEl = card.querySelector('.badge');
+  badgeEl.className = `badge ${{ pending:'badge-yellow', accepted:'badge-green', rejected:'badge-red' }[newStatus]}`;
+  badgeEl.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
 
   try {
     const data = await api.put(`applications.php?action=status&id=${appId}`, { status: newStatus });
     if (data.error) throw new Error(data.error);
     showToast(`Status updated to "${newStatus}"`);
-    // Refresh counts
     await loadDashboard();
   } catch (err) {
     showToast('Failed to update status: ' + err.message, 'error');
-    // Revert by reloading
     loadApplicants();
   }
 }
 
-// ── INIT ─────────────────────────────────────────────────────────────────────
+// 
 loadDashboard();
 </script>
 
